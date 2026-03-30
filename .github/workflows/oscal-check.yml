@@ -25,6 +25,10 @@ jobs:
       - name: Install trestle
         run: pip install compliance-trestle
 
+      - name: Initialize trestle workspace
+        working-directory: docs/compliance
+        run: trestle init
+
       - name: Validate component-definition.json
         working-directory: docs/compliance
         run: |
