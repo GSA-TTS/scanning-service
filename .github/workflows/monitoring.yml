@@ -193,5 +193,4 @@ jobs:
         with:
           name: sha-pinning-audit-${{ github.run_id }}
           path: pinning-audit.md
-          path: metrics.md
           retention-days: 90
