@@ -512,7 +512,7 @@
                 ]
               },
               {
-                "uuid": "a5b6c7d8-9e0f-4a1b-c2d3-4e5f6a7b8c9d",
+                "uuid": "57a4b8a1-2bed-41b2-ad4e-437c20331183",
                 "control-id": "sr-3",
                 "description": "",
                 "props": [
@@ -524,7 +524,7 @@
                 "statements": [
                   {
                     "statement-id": "sr-3_smt",
-                    "uuid": "b6c7d8e9-0f1a-4b2c-d3e4-5f6a7b8c9d0e",
+                    "uuid": "ab1b474c-d9b1-4a25-ad4d-0d0784240230",
                     "description": "The org establishes a supply chain risk management process for CI/CD dependencies: centralized scanning (Renovate), version pinning (SHA), integrity verification (cryptographic hash), vulnerability monitoring (Dependabot alerts + SLA tracking), and automated remediation (Renovate PRs). This covers all dependency ecosystems, not just GitHub Actions.",
                     "props": [
                       {
@@ -540,7 +540,7 @@
                 ]
               },
               {
-                "uuid": "c7d8e9f0-1a2b-4c3d-e4f5-6a7b8c9d0e1f",
+                "uuid": "92567020-93fa-4609-be43-260dc379f5cf",
                 "control-id": "sr-4",
                 "description": "",
                 "props": [
@@ -552,7 +552,7 @@
                 "statements": [
                   {
                     "statement-id": "sr-4_smt",
-                    "uuid": "d8e9f0a1-2b3c-4d4e-f5a6-7b8c9d0e1f2a",
+                    "uuid": "52e12f7c-c8a5-4397-a348-1c884b271025",
                     "description": "SHA pins create a verifiable chain from the exact upstream commit to the workflow that runs in the org's CI. Version comments (e.g., # v4.2.2) provide human-readable provenance alongside the machine-verifiable hash. The pinDigestsHelper setting adds these comments automatically.",
                     "props": [
                       {
