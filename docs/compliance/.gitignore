@@ -1,0 +1,12 @@
+# trestle init scaffolding (recreated by CI)
+.trestle/config.ini
+.trestle/cache/
+assessment-plans/
+assessment-results/
+catalogs/
+dist/
+mapping-collections/
+plan-of-action-and-milestones/
+profiles/
+system-security-plans/
+component-definitions/.keep
