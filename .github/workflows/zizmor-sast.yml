@@ -1,0 +1,273 @@
+name: "zizmor SAST: GitHub Actions Security Analysis"
+
+on:
+  schedule:
+    - cron: "0 12 * * 3" # Wednesday 12:00 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Report findings without creating PRs/issues"
+        type: boolean
+        default: false
+
+jobs:
+  sast-scan:
+    name: Scan org repos for Actions security issues
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.RENOVATE_APP_ID }}
+          private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Install zizmor
+        run: |
+          curl -sfL https://github.com/woodruffw/zizmor/releases/latest/download/zizmor-x86_64-unknown-linux-gnu.tar.gz | tar xz
+          chmod +x zizmor
+          sudo mv zizmor /usr/local/bin/
+
+      - name: Scan repos
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          ORG: ${{ github.repository_owner }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+          ZIZMOR_GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          set -euo pipefail
+
+          TODAY=$(date -u +%Y-%m-%d)
+          LABEL="actions-security"
+          PR_PREFIX="fix: zizmor auto-fix Actions security findings"
+          ISSUE_PREFIX="zizmor: Actions security findings"
+
+          # Create a zizmor config that skips unpinned-uses (Renovate handles that)
+          cat > /tmp/zizmor.yml <<'ZIZMOR_CONFIG'
+          rules:
+            unpinned-uses:
+              ignore:
+                - "**"
+          ZIZMOR_CONFIG
+
+          # Fetch all non-archived repos
+          REPOS=$(gh api --paginate "/orgs/${ORG}/repos?type=all&per_page=100" \
+            --jq '.[] | select(.archived == false) | .full_name')
+
+          SCANNED=0
+          CLEAN=0
+          FINDINGS=0
+          FIXED=0
+          REPORTED=0
+
+          echo "# zizmor SAST Report — $TODAY" > sast-report.md
+          echo "" >> sast-report.md
+
+          for repo in $REPOS; do
+            SHORT_NAME=$(echo "$repo" | cut -d'/' -f2)
+
+            # Only scan repos that have opted in (merged the onboarding PR)
+            HAS_RENOVATE=$(gh api "/repos/${repo}/contents/renovate.json" --jq '.name' 2>/dev/null || true)
+            if [ -z "$HAS_RENOVATE" ]; then
+              HAS_RENOVATE=$(gh api "/repos/${repo}/contents/renovate.json5" --jq '.name' 2>/dev/null || true)
+            fi
+            if [ -z "$HAS_RENOVATE" ]; then
+              HAS_RENOVATE=$(gh api "/repos/${repo}/contents/.renovaterc" --jq '.name' 2>/dev/null || true)
+            fi
+            if [ -z "$HAS_RENOVATE" ]; then
+              HAS_RENOVATE=$(gh api "/repos/${repo}/contents/.renovaterc.json" --jq '.name' 2>/dev/null || true)
+            fi
+            if [ -z "$HAS_RENOVATE" ]; then
+              continue
+            fi
+
+            # Check if repo has workflow files
+            WORKFLOW_COUNT=$(gh api "/repos/${repo}/contents/.github/workflows" \
+              --jq 'length' 2>/dev/null || echo "0")
+
+            if [ "$WORKFLOW_COUNT" = "0" ]; then
+              continue
+            fi
+
+            SCANNED=$((SCANNED + 1))
+            WORKDIR=$(mktemp -d)
+
+            # Clone the repo (shallow)
+            gh repo clone "$repo" "$WORKDIR" -- --depth 1 --quiet 2>/dev/null || {
+              echo "::warning::Failed to clone ${repo}, skipping"
+              rm -rf "$WORKDIR"
+              continue
+            }
+
+            # Run zizmor in report mode first (no fixes)
+            REPORT_OUTPUT=$(zizmor --config /tmp/zizmor.yml --format plain \
+              "$WORKDIR/.github/workflows/" 2>&1 || true)
+
+            if [ -z "$REPORT_OUTPUT" ] || echo "$REPORT_OUTPUT" | grep -q "No findings"; then
+              CLEAN=$((CLEAN + 1))
+              rm -rf "$WORKDIR"
+              continue
+            fi
+
+            FINDINGS=$((FINDINGS + 1))
+
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "### ${SHORT_NAME}" >> sast-report.md
+              echo '```' >> sast-report.md
+              echo "$REPORT_OUTPUT" >> sast-report.md
+              echo '```' >> sast-report.md
+              echo "" >> sast-report.md
+              rm -rf "$WORKDIR"
+              continue
+            fi
+
+            # Try auto-fixing (safe fixes only)
+            FIX_OUTPUT=$(zizmor --config /tmp/zizmor.yml --fix \
+              "$WORKDIR/.github/workflows/" 2>&1 || true)
+
+            cd "$WORKDIR"
+
+            if git diff --quiet; then
+              # No auto-fixable changes — open an issue with findings
+              EXISTING_ISSUE=$(gh issue list --repo "$repo" --state open \
+                --search "in:title \"${ISSUE_PREFIX}\"" --json number,title \
+                --jq ".[] | select(.title == \"${ISSUE_PREFIX}\") | .number" \
+                | head -1 2>/dev/null || true)
+
+              ISSUE_BODY=$(cat <<ISSUE_EOF
+          **zizmor found security findings in this repo's GitHub Actions workflows.**
+
+          These findings require manual review — they cannot be auto-fixed.
+
+          <details>
+          <summary>Findings (${TODAY})</summary>
+
+          \`\`\`
+          ${REPORT_OUTPUT}
+          \`\`\`
+
+          </details>
+
+          ### What to do
+
+          Review each finding and determine if it's a real issue or an accepted risk:
+
+          - **Template injection**: Avoid expanding untrusted inputs in \`run:\` blocks. Use environment variables instead.
+          - **Excessive permissions**: Reduce \`permissions:\` to the minimum needed.
+          - **Credential exposure**: Avoid persisting credentials or writing secrets to logs/artifacts.
+          - **ref-confusion**: Use full-length refs to avoid ambiguity between branches and tags.
+
+          See [zizmor's audit documentation](https://docs.zizmor.sh/audits/) for details on each finding type.
+
+          Add \`# zizmor: ignore[rule-name]\` comments to suppress accepted risks.
+
+          ---
+          *Generated by the [zizmor SAST workflow](https://github.com/${ORG}/scanning-config/actions/workflows/zizmor-sast.yml)*
+          ISSUE_EOF
+              )
+
+              if [ -n "$EXISTING_ISSUE" ]; then
+                echo "$ISSUE_BODY" | gh issue comment "$EXISTING_ISSUE" \
+                  --repo "$repo" --body-file -
+                echo "Updated issue #${EXISTING_ISSUE} in ${repo}"
+              else
+                gh issue create --repo "$repo" \
+                  --title "$ISSUE_PREFIX" \
+                  --body "$ISSUE_BODY" \
+                  --label "$LABEL" 2>/dev/null || {
+                    # Label might not exist; create without it
+                    gh issue create --repo "$repo" \
+                      --title "$ISSUE_PREFIX" \
+                      --body "$ISSUE_BODY"
+                  }
+                echo "Created issue in ${repo}"
+              fi
+              REPORTED=$((REPORTED + 1))
+            else
+              # Auto-fixable changes found — open a PR
+              BRANCH="zizmor/sast-fixes-${TODAY}"
+
+              # Check for existing open PR
+              EXISTING_PR=$(gh pr list --repo "$repo" --state open \
+                --search "in:title \"${PR_PREFIX}\"" --json number \
+                --jq '.[0].number' 2>/dev/null || true)
+
+              if [ -n "$EXISTING_PR" ]; then
+                echo "Existing PR #${EXISTING_PR} in ${repo}, skipping"
+                FIXED=$((FIXED + 1))
+                cd /
+                rm -rf "$WORKDIR"
+                continue
+              fi
+
+              # Check for remaining unfixable findings
+              REMAINING=$(zizmor --config /tmp/zizmor.yml --format plain \
+                "$WORKDIR/.github/workflows/" 2>&1 || true)
+
+              PR_BODY=$(cat <<PR_EOF
+          zizmor found security issues in this repo's GitHub Actions workflows and applied safe auto-fixes.
+
+          ### What was fixed
+
+          \`\`\`
+          $(git diff --stat)
+          \`\`\`
+
+          $(if [ -n "$REMAINING" ] && ! echo "$REMAINING" | grep -q "No findings"; then
+            echo "### Remaining findings (need manual review)"
+            echo ""
+            echo "<details>"
+            echo "<summary>Details</summary>"
+            echo ""
+            echo "\`\`\`"
+            echo "$REMAINING"
+            echo "\`\`\`"
+            echo ""
+            echo "</details>"
+          fi)
+
+          See [zizmor's audit documentation](https://docs.zizmor.sh/audits/) for details on each finding type.
+
+          ---
+          *Generated by the [zizmor SAST workflow](https://github.com/${ORG}/scanning-config/actions/workflows/zizmor-sast.yml)*
+          PR_EOF
+              )
+
+              git config user.name "github-actions[bot]"
+              git config user.email "github-actions[bot]@users.noreply.github.com"
+              git checkout -b "$BRANCH"
+              git add -A
+              git commit -m "fix: apply zizmor safe auto-fixes for Actions security"
+              git push origin "$BRANCH"
+
+              gh pr create --repo "$repo" \
+                --title "$PR_PREFIX" \
+                --body "$PR_BODY" \
+                --head "$BRANCH" \
+                --base main
+
+              echo "Created PR in ${repo}"
+              FIXED=$((FIXED + 1))
+            fi
+
+            cd /
+            rm -rf "$WORKDIR"
+          done
+
+          echo "| Metric | Value |" >> sast-report.md
+          echo "|--------|-------|" >> sast-report.md
+          echo "| Repos scanned | ${SCANNED} |" >> sast-report.md
+          echo "| Clean repos | ${CLEAN} |" >> sast-report.md
+          echo "| Repos with findings | ${FINDINGS} |" >> sast-report.md
+          echo "| PRs opened (auto-fixed) | ${FIXED} |" >> sast-report.md
+          echo "| Issues opened/updated | ${REPORTED} |" >> sast-report.md
+
+          cat sast-report.md
+
+      - name: Upload SAST report
+        uses: actions/upload-artifact@v4
+        with:
+          name: zizmor-sast-report-${{ github.run_id }}
+          path: sast-report.md
+          retention-days: 90

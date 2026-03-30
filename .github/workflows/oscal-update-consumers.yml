@@ -1,0 +1,87 @@
+name: Notify OSCAL Consumers
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  notify-consumers:
+    name: Open PRs in consuming repos
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Add repos that import the org-dependency-management component definition
+        consumer:
+          - GSA-TTS/pic-blm-cxworks
+          # Add more repos here as they adopt the component definition
+      fail-fast: false
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.RENOVATE_APP_ID }}
+          private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ matrix.consumer }}
+
+      - name: Checkout consumer repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.consumer }}
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Download latest component definition
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+
+          # Find the component-definitions directory in the consumer
+          COMP_DIR=$(find docs -type d -name "org-dependency-management" 2>/dev/null | head -1)
+
+          if [ -z "$COMP_DIR" ]; then
+            echo "No org-dependency-management directory found in consumer repo. Skipping."
+            exit 0
+          fi
+
+          # Download the updated component definition from the release
+          curl -sfL \
+            -H "Authorization: token ${GH_TOKEN}" \
+            -H "Accept: application/octet-stream" \
+            "https://api.github.com/repos/${{ github.repository }}/contents/docs/compliance/component-definitions/org-dependency-management/component-definition.json?ref=${TAG}" \
+            | jq -r '.content' | base64 -d > "${COMP_DIR}/component-definition.json"
+
+      - name: Create update PR
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          TAG: ${{ github.event.release.tag_name }}
+          CONSUMER: ${{ matrix.consumer }}
+        run: |
+          set -euo pipefail
+
+          BRANCH="chore/update-org-dependency-management-${TAG}"
+
+          # Check if there are changes
+          if git diff --quiet; then
+            echo "No changes to component definition. Skipping PR."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add -A
+          git commit -m "chore: update org-dependency-management component definition to ${TAG}"
+          git push origin "$BRANCH"
+
+          gh pr create \
+            --title "chore: update org-dependency-management OSCAL component to ${TAG}" \
+            --body "Updates the org-dependency-management component definition to [${TAG}](https://github.com/${{ github.repository }}/releases/tag/${TAG}).
+
+          This is an automated PR from the [scanning-config OSCAL update workflow](https://github.com/${{ github.repository }}/actions/workflows/oscal-update-consumers.yml).
+
+          Review the [release notes](https://github.com/${{ github.repository }}/releases/tag/${TAG}) for details on control statement changes." \
+            --head "$BRANCH" \
+            --base main

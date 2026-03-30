@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Generate editable markdown from the component-definition.json
+# Run inside docker-trestle: docker run -it --rm -e SKIP_TRESTLE_CONFIG=true -v $(pwd):/app/docs ghcr.io/gsa-tts/trestle bash
+
+cd "$(dirname "$0")/.."
+
+trestle author component-generate \
+  --name org-dependency-management \
+  --output control-statements

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Assemble control-statement markdown back into component-definition.json
+# Run inside docker-trestle: docker run -it --rm -e SKIP_TRESTLE_CONFIG=true -v $(pwd):/app/docs ghcr.io/gsa-tts/trestle bash
+
+cd "$(dirname "$0")/.."
+
+trestle author component-assemble \
+  --name org-dependency-management \
+  --markdown control-statements

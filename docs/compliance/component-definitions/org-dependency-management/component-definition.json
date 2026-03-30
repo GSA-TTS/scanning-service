@@ -1,0 +1,608 @@
+{
+  "component-definition": {
+    "uuid": "9ce247c8-f6cf-4918-9a14-523696d90365",
+    "metadata": {
+      "title": "org-dependency-management Component Definition",
+      "last-modified": "2025-07-17T00:00:00.000000+00:00",
+      "version": "1.0.0",
+      "oscal-version": "1.1.2"
+    },
+    "components": [
+      {
+        "uuid": "92fdf4df-49cf-4d1b-9762-c1610226fd53",
+        "type": "service",
+        "title": "org-dependency-management",
+        "description": "Centralized dependency management service providing SHA-pinned GitHub Actions, automated dependency updates via Renovate, vulnerability SLA tracking, supply chain integrity verification, and GitHub Actions SAST analysis via zizmor across the GSA-TTS GitHub org.",
+        "props": [
+          {
+            "name": "Rule_Id",
+            "value": "renovate-onboarded",
+            "remarks": "rule_renovate_onboarded"
+          },
+          {
+            "name": "Rule_Description",
+            "value": "The system repo has merged the Renovate onboarding PR and extends the org preset",
+            "remarks": "rule_renovate_onboarded"
+          },
+          {
+            "name": "Rule_Id",
+            "value": "sha-pins-verified",
+            "remarks": "rule_sha_pins_verified"
+          },
+          {
+            "name": "Rule_Description",
+            "value": "All GitHub Actions uses: refs in the repo are SHA-pinned",
+            "remarks": "rule_sha_pins_verified"
+          },
+          {
+            "name": "Rule_Id",
+            "value": "vulnerability-sla-tracked",
+            "remarks": "rule_vulnerability_sla_tracked"
+          },
+          {
+            "name": "Rule_Description",
+            "value": "Centralized vulnerability SLA tracking is active for this repo via the org GitHub App",
+            "remarks": "rule_vulnerability_sla_tracked"
+          },
+          {
+            "name": "Rule_Id",
+            "value": "depmgmt-implemented",
+            "remarks": "rule_depmgmt_implemented"
+          },
+          {
+            "name": "Rule_Description",
+            "value": "This control is fully implemented for the scope of the org dependency management component",
+            "remarks": "rule_depmgmt_implemented"
+          },
+          {
+            "name": "Rule_Id",
+            "value": "actions-sast-scanned",
+            "remarks": "rule_actions_sast_scanned"
+          },
+          {
+            "name": "Rule_Description",
+            "value": "GitHub Actions workflows are scanned for security issues via centralized zizmor SAST analysis",
+            "remarks": "rule_actions_sast_scanned"
+          }
+        ],
+        "control-implementations": [
+          {
+            "uuid": "1a0acc2c-d87b-49f6-a0af-53b4a4655403",
+            "source": "https://raw.githubusercontent.com/usnistgov/oscal-content/refs/tags/v1.3.0/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json",
+            "description": "Controls implemented via the org-wide centralized dependency management service",
+            "implemented-requirements": [
+              {
+                "uuid": "2ec548f1-3eb9-46ef-86d4-2bd1ef0a4e48",
+                "control-id": "cm-2",
+                "description": "",
+                "props": [
+                  {
+                    "name": "implementation-status",
+                    "value": "partial"
+                  }
+                ],
+                "statements": [
+                  {
+                    "statement-id": "cm-2_smt",
+                    "uuid": "85c0ddb5-a8fe-41b5-b689-e06e4068ef72",
+                    "description": "SHA-pinned workflow files and lockfiles establish a documented, reviewable baseline for CI/CD pipeline dependencies. Renovate PRs create an auditable change trail for each baseline update. The centralized preset ensures all repos maintain consistent baseline configuration for dependency management.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "renovate-onboarded"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "f79c6f4a-5257-43fd-8de5-7d2a0b83026d",
+                "control-id": "cm-3",
+                "description": "",
+                "props": [
+                  {
+                    "name": "implementation-status",
+                    "value": "partial"
+                  }
+                ],
+                "statements": [
+                  {
+                    "statement-id": "cm-3_smt.b",
+                    "uuid": "3deaa64f-e4cc-43d4-b1bb-0b0c3fe98cf6",
+                    "description": "All dependency version changes go through PR review — Renovate creates a PR, CI checks run, and a team member reviews and merges. The org-level lint check and optional ruleset enforce this gate. No ad-hoc version changes are possible once enforcement is active.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "renovate-onboarded"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  },
+                  {
+                    "statement-id": "cm-3_smt.f",
+                    "uuid": "4a0a02e7-a77a-4636-ac28-b0265a8c25a2",
+                    "description": "Renovate's weekly schedule, PR concurrency limits, and grouping rules provide controlled change windows. Changes are scheduled before 7am on weekdays, limited to 5 concurrent PRs and 1 per hour, ensuring changes are introduced in a controlled, reviewable manner.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "renovate-onboarded"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "9de263a2-81c9-4630-bb5f-2347a2b76bc0",
+                "control-id": "cm-6",
+                "description": "",
+                "props": [
+                  {
+                    "name": "implementation-status",
+                    "value": "partial"
+                  }
+                ],
+                "statements": [
+                  {
+                    "statement-id": "cm-6_smt.a",
+                    "uuid": "942ee610-a054-4ffc-92d2-53e9854f51a6",
+                    "description": "The centralized Renovate preset (default.json5) defines mandatory configuration settings for all repos, with inline compliance annotations documenting which control parts each setting supports. Deviations require explicit overrides documented in the repo's renovate.json. The JSON5 format enables comments that make each setting's compliance significance visible to future editors.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "renovate-onboarded"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "bb73cd7c-506a-497a-84ed-58e1f3fa7d00",
+                "control-id": "cm-7",
+                "description": "",
+                "props": [
+                  {
+                    "name": "implementation-status",
+                    "value": "partial"
+                  }
+                ],
+                "statements": [
+                  {
+                    "statement-id": "cm-7_smt.a",
+                    "uuid": "3ca7dbc8-ffcc-4e2d-8d30-e8baeee932b8",
+                    "description": "SHA pinning ensures repos use only the exact, reviewed version of each Action — not whatever a mutable tag (e.g., @v4 or @main) resolves to at any given moment. This reduces attack surface from mutable references and enforces least functionality for CI/CD pipeline dependencies. Centralized zizmor SAST analysis detects excessive permission scopes granted to workflow runners, flagging cases where permissions exceed what the workflow actually needs.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "sha-pins-verified"
+                      },
+                      {
+                        "name": "Rule_Id",
+                        "value": "actions-sast-scanned"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "6c32bf45-c6fc-4b89-abff-f70bc7aedd02",
+                "control-id": "ia-9",
+                "description": "",
+                "props": [
+                  {
+                    "name": "implementation-status",
+                    "value": "partial"
+                  }
+                ],
+                "statements": [
+                  {
+                    "statement-id": "ia-9_smt",
+                    "uuid": "f460e00b-ba2d-49c6-8642-00ccbe39658a",
+                    "description": "The GitHub App used by Renovate has scoped permissions (contents: write, pull-requests: write, workflows: write, metadata: read, vulnerability_alerts: read, issues: write) and provides an auditable identity for all automated PRs. This is distinct from human identities, enabling clear attribution of automated vs. manual dependency changes in the audit trail.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "depmgmt-implemented"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "1bf79ef7-5fdf-4f35-8be4-01541013a0a5",
+                "control-id": "ra-5",
+                "description": "",
+                "props": [
+                  {
+                    "name": "implementation-status",
+                    "value": "partial"
+                  }
+                ],
+                "statements": [
+                  {
+                    "statement-id": "ra-5_smt.a",
+                    "uuid": "b55c4aba-f1ab-4466-9dcc-6253b68c4757",
+                    "description": "Dependabot alerts scan all dependency ecosystems (npm, pip, Docker, Go, Terraform, bundler, GitHub Actions, etc.) for known vulnerabilities. Renovate's vulnerabilityAlerts setting creates immediate PRs when GitHub Security Advisory alerts fire, directly tying remediation PRs to CVEs. Together, these provide continuous vulnerability monitoring across all dependency types.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "vulnerability-sla-tracked"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  },
+                  {
+                    "statement-id": "ra-5_smt.c",
+                    "uuid": "714d16c9-a8cb-4a27-a258-2848dd370dc3",
+                    "description": "The centralized vulnerability SLA tracker analyzes alert severity, age, and CISA KEV status weekly, producing a status report per repo posted to a tracking issue. Reports categorize alerts as on-track, approaching, or overdue against GSA remediation timelines.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "vulnerability-sla-tracked"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  },
+                  {
+                    "statement-id": "ra-5_smt.d",
+                    "uuid": "6db46bcd-a98b-4bf0-9c6e-91041a3ddc01",
+                    "description": "SLA thresholds enforce timely remediation per GSA CIO 2100.1: Critical/High 30 days, Medium 90 days, Low 180 days, CISA KEV 14 days per BOD 22-01. The weekly SLA report flags overdue alerts and approaching deadlines.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "vulnerability-sla-tracked"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  },
+                  {
+                    "statement-id": "ra-5_smt.f",
+                    "uuid": "777c659e-94ad-4723-9a93-d957aa0d07de",
+                    "description": "Both Renovate and Dependabot automatically update their vulnerability databases. Renovate pulls the latest advisory data each run, and GitHub continuously updates the GitHub Advisory Database. No manual database maintenance is required.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "vulnerability-sla-tracked"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "18819565-1966-44ea-834f-018d760c13aa",
+                "control-id": "sa-10",
+                "description": "",
+                "props": [
+                  {
+                    "name": "implementation-status",
+                    "value": "partial"
+                  }
+                ],
+                "statements": [
+                  {
+                    "statement-id": "sa-10_smt.c",
+                    "uuid": "b49253da-8bb7-4a19-95e4-b066e5129729",
+                    "description": "The org mandates that all CI/CD pipeline dependencies be tracked, versioned, and updated through a controlled process (Renovate + PR review). The lint check verifies compliance. SHA-pinned refs and lockfiles provide a complete manifest of external dependencies.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "renovate-onboarded"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "bc59ab2b-b736-47ea-a1b2-cf89e2d770b6",
+                "control-id": "sa-11",
+                "description": "",
+                "props": [
+                  {
+                    "name": "implementation-status",
+                    "value": "partial"
+                  }
+                ],
+                "statements": [
+                  {
+                    "statement-id": "sa-11_smt.a",
+                    "uuid": "7da1f265-5ba0-44f1-80eb-5bd0403d3c90",
+                    "description": "PR-based updates ensure that CI tests run against every dependency version change before it reaches the default branch. Merge decisions remain with each team, who are responsible for their own test quality. The PR review gate enforces that no dependency change bypasses the test pipeline. Centralized zizmor SAST analysis provides automated static security testing of GitHub Actions workflow definitions, detecting template injection, credential exposure, excessive permissions, and other security anti-patterns. Auto-fixable findings are remediated via PR; unfixable findings are reported via issue for manual review.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "renovate-onboarded"
+                      },
+                      {
+                        "name": "Rule_Id",
+                        "value": "actions-sast-scanned"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "43a686c5-04d4-42dc-81dd-e390efaec8b4",
+                "control-id": "sa-22",
+                "description": "",
+                "props": [
+                  {
+                    "name": "implementation-status",
+                    "value": "partial"
+                  }
+                ],
+                "statements": [
+                  {
+                    "statement-id": "sa-22_smt.a",
+                    "uuid": "983ee0a0-9d69-46b2-b721-d4835b1599a5",
+                    "description": "The Renovate preset extends replacements:all, which automatically creates PRs to migrate when a dependency has a known successor (renamed, transferred to new org, or community-forked after abandonment). The abandonments:recommended preset flags packages with no release in 1 year. Together, these provide automated detection and remediation for unsupported components across all ecosystems (npm, pip, Docker, Go, Terraform, GitHub Actions, Maven, etc.).",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "depmgmt-implemented"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  },
+                  {
+                    "statement-id": "sa-22_smt.b",
+                    "uuid": "a65b2e3f-7c91-4d08-b5a0-9f3e81c24d67",
+                    "description": "When abandonments:recommended flags a dependency and no replacements:all rule exists for it, the team evaluates alternatives. If no alternative exists and the component remains essential, teams document the decision to maintain/fork it and accept the risk. The monitoring dashboard tracks repos with open abandonment warnings to ensure timely resolution.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "depmgmt-implemented"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "d8f4a219-3b6e-4c5a-8e72-1a9bc0d53f48",
+                "control-id": "si-2",
+                "description": "",
+                "props": [
+                  {
+                    "name": "implementation-status",
+                    "value": "partial"
+                  }
+                ],
+                "statements": [
+                  {
+                    "statement-id": "si-2_smt.a",
+                    "uuid": "e7c38b5d-9a14-4f6e-b823-5d0ac7e91f34",
+                    "description": "Renovate automatically detects when pinned dependencies have newer versions available (including security patches) and creates PRs. The vulnerabilityAlerts setting creates immediate PRs when GitHub Security Advisory alerts fire, bypassing the normal schedule window.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "vulnerability-sla-tracked"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  },
+                  {
+                    "statement-id": "si-2_smt.b",
+                    "uuid": "c4d91f78-2e5a-4b39-a016-8f7d3ca52e90",
+                    "description": "CI tests run against every dependency update PR before merge, validating that the flaw remediation does not break system functionality. Teams review test results before merging.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "vulnerability-sla-tracked"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  },
+                  {
+                    "statement-id": "si-2_smt.c",
+                    "uuid": "a1b2c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+                    "description": "The 2-day minimumReleaseAge ensures stability while the centralized vulnerability SLA tracker enforces GSA CIO 2100.1 remediation timelines (Critical/High 30d, Medium 90d, Low 180d, CISA KEV 14d). Weekly SLA reports flag overdue alerts.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "vulnerability-sla-tracked"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  },
+                  {
+                    "statement-id": "si-2_smt.d",
+                    "uuid": "b2c3d4e5-6f7a-4b8c-9d0e-1f2a3b4c5d6e",
+                    "description": "Dependency updates are incorporated into the organizational configuration management process — all changes go through Renovate PRs, CI validation, and team review before merging to the default branch.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "vulnerability-sla-tracked"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "e3f4a5b6-7c8d-4e9f-a0b1-2c3d4e5f6a7b",
+                "control-id": "si-7",
+                "description": "",
+                "props": [
+                  {
+                    "name": "implementation-status",
+                    "value": "partial"
+                  }
+                ],
+                "statements": [
+                  {
+                    "statement-id": "si-7_smt",
+                    "uuid": "f4a5b6c7-8d9e-4f0a-b1c2-3d4e5f6a7b8c",
+                    "description": "SHA-256 commit hashes provide cryptographic integrity verification for all GitHub Actions dependencies. The exact code that was reviewed is the code that runs. Tag references (@v4) are mutable and can be force-pushed by upstream maintainers; SHA references cannot be altered without detection. The pinDigests setting enforces this automatically across all repos. Additionally, centralized zizmor SAST analysis detects template injection vulnerabilities where attacker-controlled inputs could be expanded into executable code, and identifies credential persistence risks where secrets may leak into logs or artifacts.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "sha-pins-verified"
+                      },
+                      {
+                        "name": "Rule_Id",
+                        "value": "actions-sast-scanned"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "a5b6c7d8-9e0f-4a1b-c2d3-4e5f6a7b8c9d",
+                "control-id": "sr-3",
+                "description": "",
+                "props": [
+                  {
+                    "name": "implementation-status",
+                    "value": "partial"
+                  }
+                ],
+                "statements": [
+                  {
+                    "statement-id": "sr-3_smt",
+                    "uuid": "b6c7d8e9-0f1a-4b2c-d3e4-5f6a7b8c9d0e",
+                    "description": "The org establishes a supply chain risk management process for CI/CD dependencies: centralized scanning (Renovate), version pinning (SHA), integrity verification (cryptographic hash), vulnerability monitoring (Dependabot alerts + SLA tracking), and automated remediation (Renovate PRs). This covers all dependency ecosystems, not just GitHub Actions.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "depmgmt-implemented"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "c7d8e9f0-1a2b-4c3d-e4f5-6a7b8c9d0e1f",
+                "control-id": "sr-4",
+                "description": "",
+                "props": [
+                  {
+                    "name": "implementation-status",
+                    "value": "partial"
+                  }
+                ],
+                "statements": [
+                  {
+                    "statement-id": "sr-4_smt",
+                    "uuid": "d8e9f0a1-2b3c-4d4e-f5a6-7b8c9d0e1f2a",
+                    "description": "SHA pins create a verifiable chain from the exact upstream commit to the workflow that runs in the org's CI. Version comments (e.g., # v4.2.2) provide human-readable provenance alongside the machine-verifiable hash. The pinDigestsHelper setting adds these comments automatically.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "sha-pins-verified"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "e9f0a1b2-3c4d-4e5f-a6b7-8c9d0e1f2a3b",
+                "control-id": "sr-11",
+                "description": "",
+                "props": [
+                  {
+                    "name": "implementation-status",
+                    "value": "partial"
+                  }
+                ],
+                "statements": [
+                  {
+                    "statement-id": "sr-11_smt",
+                    "uuid": "f0a1b2c3-4d5e-4f6a-b7c8-9d0e1f2a3b4c",
+                    "description": "SHA pinning prevents tag-hijacking attacks where an attacker force-pushes a malicious commit to an existing tag. The SHA-256 hash guarantees the Action code matches what was originally reviewed. Centralized zizmor SAST analysis further detects ref-confusion and impostor commit risks — cases where ambiguous git references could resolve to unintended code. Together, SHA pinning and SAST scanning prevent counterfeit or tampered dependencies from entering the CI/CD pipeline.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "sha-pins-verified"
+                      },
+                      {
+                        "name": "Rule_Id",
+                        "value": "actions-sast-scanned"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

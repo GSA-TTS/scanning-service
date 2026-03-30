@@ -1,0 +1,74 @@
+name: OSCAL Drift Check
+
+on:
+  pull_request:
+    paths:
+      - "docs/compliance/**"
+  push:
+    branches: [main]
+    paths:
+      - "docs/compliance/**"
+
+jobs:
+  oscal-check:
+    name: Validate OSCAL component definition
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install trestle
+        run: pip install compliance-trestle
+
+      - name: Validate component-definition.json
+        working-directory: docs/compliance
+        run: |
+          set -euo pipefail
+
+          if [ ! -f component-definitions/org-dependency-management/component-definition.json ]; then
+            echo "::error::component-definition.json not found"
+            exit 1
+          fi
+
+          # Validate JSON schema
+          trestle validate -t component-definition \
+            -n org-dependency-management
+
+      - name: Check markdown ↔ JSON consistency
+        working-directory: docs/compliance
+        run: |
+          set -euo pipefail
+
+          # Regenerate markdown from JSON and check for drift
+          trestle author component-generate \
+            --name org-dependency-management \
+            --output generated-check
+
+          # Compare generated markdown against committed markdown
+          DRIFT=false
+          for f in generated-check/org-dependency-management/*/*.md; do
+            RELATIVE=${f#generated-check/}
+            if [ -f "$RELATIVE" ]; then
+              if ! diff -q "$f" "$RELATIVE" > /dev/null 2>&1; then
+                echo "::warning::Drift detected in ${RELATIVE}"
+                diff "$f" "$RELATIVE" || true
+                DRIFT=true
+              fi
+            else
+              echo "::warning::Missing committed file: ${RELATIVE}"
+              DRIFT=true
+            fi
+          done
+
+          if [ "$DRIFT" = true ]; then
+            echo "::error::OSCAL drift detected. Run 'bin/generate-depmgmt-markdown' and 'bin/assemble-depmgmt-json' to sync."
+            exit 1
+          fi
+
+          echo "No OSCAL drift detected."
+          rm -rf generated-check

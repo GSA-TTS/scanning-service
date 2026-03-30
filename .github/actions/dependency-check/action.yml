@@ -1,0 +1,95 @@
+name: "Dependency Check"
+description: "Check GitHub Actions SHA pinning, lockfile presence, and Docker digest pinning"
+
+inputs:
+  fail-on-error:
+    description: "Whether to fail on lint errors"
+    required: false
+    default: "false"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install zizmor
+      shell: bash
+      run: |
+        curl -sfL https://github.com/woodruffw/zizmor/releases/latest/download/zizmor-x86_64-unknown-linux-gnu.tar.gz | tar xz
+        chmod +x zizmor
+        sudo mv zizmor /usr/local/bin/
+
+    - name: Check GitHub Actions SHA pinning
+      id: actions-lint
+      shell: bash
+      continue-on-error: true
+      run: |
+        echo "## GitHub Actions SHA Pinning" >> "$GITHUB_STEP_SUMMARY"
+        if [ -d .github/workflows ]; then
+          if zizmor --format plain .github/workflows/ 2>&1 | tee zizmor-output.txt; then
+            echo "All Actions refs are SHA-pinned." >> "$GITHUB_STEP_SUMMARY"
+            echo "actions_clean=true" >> "$GITHUB_OUTPUT"
+          else
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat zizmor-output.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "actions_clean=false" >> "$GITHUB_OUTPUT"
+          fi
+        else
+          echo "No .github/workflows/ directory found." >> "$GITHUB_STEP_SUMMARY"
+          echo "actions_clean=true" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Check lockfile presence
+      id: lockfile-check
+      shell: bash
+      continue-on-error: true
+      run: |
+        echo "## Lockfile Presence" >> "$GITHUB_STEP_SUMMARY"
+        MISSING=""
+        if [ -f package.json ] && [ ! -f package-lock.json ] && [ ! -f npm-shrinkwrap.json ]; then
+          MISSING="${MISSING}\n- **npm**: package.json without lockfile"
+        fi
+        if ([ -f pyproject.toml ] || [ -f setup.py ]) && [ ! -f requirements.txt ] && [ ! -f uv.lock ] && [ ! -f Pipfile.lock ] && [ ! -f poetry.lock ]; then
+          MISSING="${MISSING}\n- **Python**: project config without lockfile"
+        fi
+        if [ -f Gemfile ] && [ ! -f Gemfile.lock ]; then
+          MISSING="${MISSING}\n- **bundler**: Gemfile without Gemfile.lock"
+        fi
+        if [ -f go.mod ] && [ ! -f go.sum ]; then
+          MISSING="${MISSING}\n- **Go**: go.mod without go.sum"
+        fi
+        if [ -z "$MISSING" ]; then
+          echo "All detected ecosystems have lockfiles." >> "$GITHUB_STEP_SUMMARY"
+          echo "lockfiles_clean=true" >> "$GITHUB_OUTPUT"
+        else
+          echo -e "Missing lockfiles:${MISSING}" >> "$GITHUB_STEP_SUMMARY"
+          echo "lockfiles_clean=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Check Docker digest pinning
+      id: docker-check
+      shell: bash
+      continue-on-error: true
+      run: |
+        echo "## Docker Digest Pinning" >> "$GITHUB_STEP_SUMMARY"
+        UNPINNED=$(grep -rn '^FROM ' Dockerfile* docker-compose*.yml 2>/dev/null \
+          | grep -v '@sha256:' | grep -v '^#' | grep -v 'scratch' || true)
+        if [ -z "$UNPINNED" ]; then
+          echo "All Docker FROM lines are digest-pinned (or no Dockerfiles found)." >> "$GITHUB_STEP_SUMMARY"
+          echo "docker_clean=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "Unpinned Docker images:" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "$UNPINNED" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "docker_clean=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Evaluate results
+      if: inputs.fail-on-error == 'true'
+      shell: bash
+      run: |
+        FAILED=false
+        [ "${{ steps.actions-lint.outputs.actions_clean }}" = "false" ] && FAILED=true
+        [ "${{ steps.lockfile-check.outputs.lockfiles_clean }}" = "false" ] && FAILED=true
+        [ "${{ steps.docker-check.outputs.docker_clean }}" = "false" ] && FAILED=true
+        [ "$FAILED" = "true" ] && exit 1

@@ -1,0 +1,91 @@
+{
+  // --- Integrity & Supply Chain (SI-7, SR-4, SR-11, CM-7) ---
+  // Converts mutable tag refs (e.g., @v4) to immutable SHA-256 commit hashes.
+  // Removing or disabling these breaks cryptographic integrity verification.
+  "pinDigests": true,       // SI-7, SR-11, CM-7: immutable hash guarantees code integrity
+  "pinDigestsHelper": true, // SR-4: adds human-readable version comment for provenance
+
+  // --- Baseline & Config Management (CM-2, CM-3, CM-6, SA-10) ---
+  "extends": [
+    "config:recommended",       // CM-6: org-mandated baseline configuration
+    "replacements:all",         // SA-22a: auto-migrate deprecated/renamed packages
+    "abandonments:recommended"  // SA-22b: flag packages with no release in 1 year
+  ],
+
+  // --- Flaw Remediation & Vuln Monitoring (SI-2, RA-5) ---
+  // Cool-off prevents pulling retracted releases; SLA timelines (not configured here)
+  // enforce remediation speed separately.
+  "minimumReleaseAge": "2 days", // SI-2: stabilization before PR creation
+
+  // Immediate PRs for known CVEs — bypasses schedule window.
+  // Disabling this delays remediation and weakens SI-2c/RA-5d SLA compliance.
+  "vulnerabilityAlerts": {
+    "enabled": true,   // SI-2c, RA-5a: immediate response to security advisories
+    "labels": ["security"],
+    "schedule": []     // SI-2c: no delay — overrides the schedule below for vuln fixes
+  },
+
+  // --- Change Control & Review (CM-3, SA-11) ---
+  "packageRules": [
+    // Grouping rules reduce PR noise while maintaining per-ecosystem visibility.
+    // Each group creates a single PR that goes through CI + review (CM-3, SA-11).
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions",
+      "addLabels": ["dependencies", "github-actions"]
+      // CM-3, SI-7, SR-11: all Actions changes reviewed in one PR
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "npm patch/minor",
+      "addLabels": ["dependencies", "npm"]
+    },
+    {
+      "matchManagers": ["pip_requirements", "pip_setup", "pipenv", "poetry", "pep621"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "pip patch/minor",
+      "addLabels": ["dependencies", "pip"]
+    },
+    {
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "groupName": "Docker",
+      "addLabels": ["dependencies", "docker"]
+      // SI-7: Docker digest pinning provides image integrity
+    },
+    {
+      "matchManagers": ["terraform", "terraform-version"],
+      "groupName": "Terraform providers",
+      "addLabels": ["dependencies", "terraform"]
+    },
+    {
+      "matchManagers": ["gomod"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "Go modules patch/minor",
+      "addLabels": ["dependencies", "go"]
+    },
+    {
+      "matchManagers": ["bundler"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "bundler patch/minor",
+      "addLabels": ["dependencies", "bundler"]
+    },
+    {
+      // SA-22b: makes abandonment warnings easy to find and track
+      "matchUpdateTypes": ["replacement"],
+      "addLabels": ["abandoned-dependency"]
+    }
+    // NOTE: Auto-merge is NOT enabled centrally — teams opt in via their
+    // own renovate.json if their test coverage warrants it. (SA-11)
+  ],
+
+  // --- Scheduling & Throttling ---
+  "schedule": ["before 7am every weekday"],  // CM-3: controlled change windows
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 1
+
+  // All Renovate managers enabled by default via config:recommended.
+  // Dependabot version updates replaced entirely — onboarding PR instructs
+  // teams to delete dependabot.yml.
+  // Dependabot alerts KEPT enabled (RA-5a: Security tab visibility).
+}
