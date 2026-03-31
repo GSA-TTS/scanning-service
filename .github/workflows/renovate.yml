@@ -1,4 +1,4 @@
-name: Renovate
+name: Renovate repos
 
 on:
   schedule:
