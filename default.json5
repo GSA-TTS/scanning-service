@@ -12,6 +12,11 @@
   "pinDigests": true,       // SI-7, SR-11, CM-7: immutable hash guarantees code integrity
   "pinDigestsHelper": true, // SR-4: adds human-readable version comment for provenance
 
+  // Allow Renovate to process forked repos that opt in by merging the
+  // onboarding PR. Forks are skipped by default; this only takes effect
+  // after a team explicitly onboards.
+  "forkProcessing": "enabled",
+
   // --- Baseline & Config Management (CM-2, CM-3, CM-6, SA-10) ---
   "extends": [
     "config:recommended",       // CM-6: org-mandated baseline configuration
