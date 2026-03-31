@@ -2,8 +2,8 @@
   // Preset description — Renovate renders these in the onboarding PR body.
   "description": [
     "After merging, Renovate will: SHA-pin all GitHub Actions refs, create grouped PRs for dependency updates, flag abandoned packages, and create immediate PRs for known CVEs.",
-    "After merging: (1) review the initial Pin Dependencies PR, (2) delete `dependabot.yml` (Renovate replaces it), (3) disable Dependabot security updates in Settings → Code security, (4) keep Dependabot **alerts** enabled for the Security tab. See the [onboarding playbook](https://github.com/GSA-TTS/scanning-config/blob/main/docs/onboarding-playbook.md) for full instructions.",
-    "This service is a **NIST 800-53 common control** (CM-2, CM-3, SI-2, SI-7, SA-22, SR-3/4/11, RA-5, IA-9). Add the provided control language to your SSP — see the [compliance docs](https://github.com/GSA-TTS/scanning-config/blob/main/docs/compliance/README.md) for details."
+    "After merging: (1) review the initial Pin Dependencies PR, (2) delete `dependabot.yml` (Renovate replaces it), (3) disable Dependabot security updates in Settings → Code security, (4) keep Dependabot **alerts** enabled for the Security tab. See the [onboarding playbook](https://github.com/GSA-TTS/scanning-service/blob/main/docs/onboarding-playbook.md) for full instructions.",
+    "This service is a **NIST 800-53 common control** (CM-2, CM-3, SI-2, SI-7, SA-22, SR-3/4/11, RA-5, IA-9). Add the provided control language to your SSP — see the [compliance docs](https://github.com/GSA-TTS/scanning-service/blob/main/docs/compliance/README.md) for details."
   ],
 
   // --- Integrity & Supply Chain (SI-7, SR-4, SR-11, CM-7) ---

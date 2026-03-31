@@ -54,7 +54,7 @@ Your repo's `renovate.json` can override any [Renovate setting](https://docs.ren
 
 ```json
 {
-  "extends": ["local>GSA-TTS/scanning-config"],
+  "extends": ["local>GSA-TTS/scanning-service"],
   "schedule": ["before 7am on Monday"],
   "packageRules": [
     {
@@ -83,7 +83,7 @@ name: Dependency Lint
 on: [pull_request]
 jobs:
   lint:
-    uses: GSA-TTS/scanning-config/.github/workflows/dependency-lint.yml@main
+    uses: GSA-TTS/scanning-service/.github/workflows/dependency-lint.yml@main
     with:
       fail-on-error: false  # advisory mode; set true to block PRs
 ```
@@ -92,7 +92,7 @@ jobs:
 
 ```yaml
 - name: Dependency check
-  uses: GSA-TTS/scanning-config/.github/actions/dependency-check@main
+  uses: GSA-TTS/scanning-service/.github/actions/dependency-check@main
   with:
     fail-on-error: "false"
 ```
@@ -129,7 +129,7 @@ If your system maintains an OSCAL-based SSP:
 ```bash
 # Inside docker-trestle, from your system's docs/compliance directory:
 copy-component -n org-dependency-management \
-  -u https://raw.githubusercontent.com/GSA-TTS/scanning-config/refs/heads/main/docs/compliance/component-definitions/org-dependency-management/component-definition.json
+  -u https://raw.githubusercontent.com/GSA-TTS/scanning-service/refs/heads/main/docs/compliance/component-definitions/org-dependency-management/component-definition.json
 ```
 
 Then add `org-dependency-management` to your `trestle-config.yaml` components list:
@@ -176,4 +176,4 @@ A: Renovate's `abandonments:recommended` flags it. Your team should evaluate alt
 ## Support
 
 - **Usage or Compliance questions:** [#dev in Slack](https://gsa-tts.slack.com/archives/C02CD5VUQ)
-- **Issues:** [GSA-TTS/scanning-config](https://github.com/GSA-TTS/scanning-config/issues)
+- **Issues:** [GSA-TTS/scanning-service](https://github.com/GSA-TTS/scanning-service/issues)

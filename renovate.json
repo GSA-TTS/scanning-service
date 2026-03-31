@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "local>GSA-TTS/scanning-config:default.json5"
+    "local>GSA-TTS/scanning-service:default.json5"
   ]
 }

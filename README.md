@@ -17,7 +17,7 @@ Add a `renovate.json` to your repo:
 
 ```json
 {
-  "extends": ["local>GSA-TTS/scanning-config"]
+  "extends": ["local>GSA-TTS/scanning-service"]
 }
 ```
 

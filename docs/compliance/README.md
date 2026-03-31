@@ -23,7 +23,7 @@ Inside `docker-trestle`, from your system's `docs/compliance` directory:
 
 ```bash
 copy-component -n org-dependency-management \
-  -u https://raw.githubusercontent.com/GSA-TTS/scanning-config/refs/heads/main/docs/compliance/component-definitions/org-dependency-management/component-definition.json
+  -u https://raw.githubusercontent.com/GSA-TTS/scanning-service/refs/heads/main/docs/compliance/component-definitions/org-dependency-management/component-definition.json
 ```
 
 Then add to your `trestle-config.yaml`:

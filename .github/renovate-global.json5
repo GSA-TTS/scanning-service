@@ -6,7 +6,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "autodiscover": true,
   "autodiscoverFilter": [
-    "GSA-TTS/scanning-config",
+    "GSA-TTS/scanning-service",
     "GSA-TTS/pic-blm-cxworks",
     "GSA-TTS/spiff-arena",
     "GSA-TTS/spiffworkflow-connector",
@@ -17,7 +17,7 @@
   "onboardingPrTitle": "Enable centralized dependency management (org common control)",
   "onboardingConfigFileName": "renovate.json",
   "onboardingConfig": {
-    "extends": ["local>GSA-TTS/scanning-config:default.json5"]
+    "extends": ["local>GSA-TTS/scanning-service:default.json5"]
   },
-  "prHeader": "Created by [GSA-TTS' central scanning service](https://github.com/GSA-TTS/scanning-config)."
+  "prHeader": "Created by [GSA-TTS' central scanning service](https://github.com/GSA-TTS/scanning-service)."
 }
