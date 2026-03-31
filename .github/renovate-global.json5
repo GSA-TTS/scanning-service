@@ -19,5 +19,5 @@
   "onboardingConfig": {
     "extends": ["local>GSA-TTS/scanning-service:default.json5"]
   },
-  "prHeader": "Created by [GSA-TTS' central scanning service](https://github.com/GSA-TTS/scanning-service)."
+  "prHeader": "_created by [GSA-TTS' central scanning service](https://redirect.github.com/GSA-TTS/scanning-service)_"
 }
