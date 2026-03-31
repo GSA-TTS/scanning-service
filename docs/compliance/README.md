@@ -1,10 +1,10 @@
 # OSCAL Component Definition: org-dependency-management
 
-This directory contains the OSCAL 1.1.2 component definition for the GSA-TTS centralized dependency management service — a **common (inherited) control** covering 14 NIST 800-53 Rev 5 controls across 6 families.
+This directory contains the OSCAL 1.1.2 component definition for the GSA-TTS centralized dependency management service, covering 14 NIST 800-53 Rev 5 controls across 6 families.
 
 ## What this is
 
-The `org-dependency-management` component defines how the org's centralized Renovate configuration, GitHub App, vulnerability SLA tracking, and CI lint checks implement dependency management controls. Systems that onboard to this service **inherit** these controls rather than implementing them independently.
+The `org-dependency-management` component defines how the org's centralized Renovate configuration, GitHub App, vulnerability SLA tracking, and CI lint checks implement dependency management controls. Systems that onboard to this service can import the component definition and incorporate its control narratives into their own SSPs.
 
 ## Controls covered
 
@@ -34,7 +34,7 @@ components:
   # ... your other components
 ```
 
-The next SSP assembly merges the inherited control narratives alongside your system's own `### This System` sections.
+The next SSP assembly merges the component's control narratives alongside your system's own `### This System` sections.
 
 ## Authoring workflow
 

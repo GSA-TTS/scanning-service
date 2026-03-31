@@ -1,6 +1,6 @@
 # Centralized Scanning for Dependency Management & CI/CD Security
 
-This repo provides centralized dependency management (using [Renovate](https://docs.renovatebot.com/)) and GitHub Actions security analysis (using [zizmor](https://github.com/woodruffw/zizmor)) for the GSA-TTS GitHub org. Together, these implement **NIST 800-53 common controls** — individual systems inherit the control implementations by onboarding.
+This repo provides centralized dependency management (using [Renovate](https://docs.renovatebot.com/)) and GitHub Actions security analysis (using [zizmor](https://github.com/woodruffw/zizmor)) for the GSA-TTS GitHub org. It ships an **OSCAL component definition** covering 14 NIST 800-53 controls that individual systems can import into their SSPs.
 
 ## What this does
 

@@ -1,8 +1,8 @@
 # Onboarding Playbook: Centralized Dependency Management
 
-This guide walks teams through adopting the org's centralized dependency management — a **NIST 800-53 common control** covering CM-2, CM-3, CM-6, CM-7, IA-9, RA-5, SA-10, SA-11, SA-22, SI-2, SI-7, SR-3, SR-4, and SR-11.
+This guide walks teams through adopting the org's centralized dependency management service, which provides an **OSCAL component definition** covering CM-2, CM-3, CM-6, CM-7, IA-9, RA-5, SA-10, SA-11, SA-22, SI-2, SI-7, SR-3, SR-4, and SR-11.
 
-After onboarding, your system inherits these controls from the org platform team. Your SSP documents them as **inherited** rather than implementing them from scratch.
+After onboarding, your system can import the component definition into its SSP and incorporate the provided control narratives directly into your system's own control documentation.
 
 ---
 
@@ -16,7 +16,7 @@ After onboarding, your system inherits these controls from the org platform team
 
 ### 1. Merge the Renovate onboarding PR
 
-Renovate automatically creates an onboarding PR titled **"Enable centralized dependency management (org common control)"** in every repo in the org.
+Renovate automatically creates an onboarding PR titled **"Enable centralized scanning service"** in every repo in the org.
 
 - Review the PR — it adds a `renovate.json` that extends the org preset
 - The PR body explains what Renovate will do once merged
@@ -140,15 +140,15 @@ components:
   # ... your other components
 ```
 
-The next SSP assembly merges the inherited control narratives alongside your system's own `### This System` sections.
+The next SSP assembly merges the component's control narratives alongside your system's own `### This System` sections.
 
-### 11. Document inherited controls in your SSP
+### 11. Document controls in your SSP
 
-For each of the 14 controls covered by this common control, your SSP should reference the org platform team as the control provider. Example language:
+For each of the 14 controls covered by this component, your SSP should describe how your system uses the scanning service. Example language:
 
-> **CM-2 Baseline Configuration** (Inherited)
+> **CM-2 Baseline Configuration**
 >
-> The GSA-TTS org platform team maintains a centralized dependency management service that establishes and enforces a documented, reviewable baseline for CI/CD pipeline dependencies. All dependency version changes go through SHA-pinned references and PR-based review. This system inherits this control by extending the org Renovate preset.
+> This system uses the GSA-TTS centralized dependency management service, which establishes and enforces a documented, reviewable baseline for CI/CD pipeline dependencies. All dependency version changes go through SHA-pinned references and PR-based review. The system extends the org Renovate preset to maintain this baseline.
 >
 > **System-specific responsibilities:** The system team merges Renovate update PRs within the remediation SLA and documents any exceptions to the pinning standard.
 

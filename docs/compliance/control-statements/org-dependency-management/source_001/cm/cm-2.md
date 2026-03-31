@@ -55,7 +55,7 @@ ______________________________________________________________________
 
 SHA-pinned workflow files and lockfiles establish a documented, reviewable baseline for CI/CD pipeline dependencies. Renovate PRs create an auditable change trail for each baseline update. A centralized preset ensures all repos maintain a consistent baseline configuration for dependency management.
 
-When a repo onboards by merging the onboarding PR, it inherits the org's baseline dependency configuration. All subsequent dependency changes are tracked via Renovate PRs, providing a complete audit trail of baseline modifications.
+When a repo onboards by merging the onboarding PR, it adopts the org's baseline dependency configuration. All subsequent dependency changes are tracked via Renovate PRs, providing a complete audit trail of baseline modifications.
 
 ### Rules:
 
