@@ -1,4 +1,4 @@
-# Centralized Dependency Management & CI/CD Security Scanning
+# Centralized Scanning for Dependency Management & CI/CD Security
 
 This repo provides centralized dependency management (using [Renovate](https://docs.renovatebot.com/)) and GitHub Actions security analysis (using [zizmor](https://github.com/woodruffw/zizmor)) for the GSA-TTS GitHub org. Together, these implement **NIST 800-53 common controls** — individual systems inherit the control implementations by onboarding.
 
