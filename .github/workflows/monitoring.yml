@@ -39,18 +39,10 @@ jobs:
           ONBOARDED=0
           NOT_ONBOARDED=""
           for repo in $REPOS; do
-            # Check for renovate config files
-            HAS_CONFIG=$(gh api "/repos/${repo}/contents/renovate.json" --jq '.name' 2>/dev/null || true)
-            if [ -z "$HAS_CONFIG" ]; then
-              HAS_CONFIG=$(gh api "/repos/${repo}/contents/renovate.json5" --jq '.name' 2>/dev/null || true)
-            fi
-            if [ -z "$HAS_CONFIG" ]; then
-              HAS_CONFIG=$(gh api "/repos/${repo}/contents/.renovaterc" --jq '.name' 2>/dev/null || true)
-            fi
-            if [ -z "$HAS_CONFIG" ]; then
-              HAS_CONFIG=$(gh api "/repos/${repo}/contents/.renovaterc.json" --jq '.name' 2>/dev/null || true)
-            fi
-            if [ -n "$HAS_CONFIG" ]; then
+            if gh api "/repos/${repo}/contents/renovate.json" > /dev/null 2>&1 || \
+               gh api "/repos/${repo}/contents/renovate.json5" > /dev/null 2>&1 || \
+               gh api "/repos/${repo}/contents/.renovaterc" > /dev/null 2>&1 || \
+               gh api "/repos/${repo}/contents/.renovaterc.json" > /dev/null 2>&1; then
               ONBOARDED=$((ONBOARDED + 1))
             else
               NOT_ONBOARDED="${NOT_ONBOARDED}\n- ${repo}"
