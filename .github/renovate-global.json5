@@ -18,5 +18,6 @@
   "onboardingConfigFileName": "renovate.json",
   "onboardingConfig": {
     "extends": ["local>GSA-TTS/scanning-config:default.json5"]
-  }
+  },
+  "prHeader": "Created by [GSA-TTS' central scanning service](https://github.com/GSA-TTS/scanning-config)."
 }
