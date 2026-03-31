@@ -35,6 +35,7 @@ jobs:
         uses: renovatebot/github-action@v46.1.7
         env:
           RENOVATE_TOKEN: ${{ steps.app-token.outputs.token }}
+          RENOVATE_DRY_RUN: ${{ inputs.dry_run == true && 'lookup' || 'null' }}
           LOG_LEVEL: info
         with:
           configurationFile: .github/renovate-global.json5
