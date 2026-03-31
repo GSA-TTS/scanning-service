@@ -14,7 +14,7 @@
   ],
 
   // --- Onboarding PR customization ---
-  "onboardingPrTitle": "Enable centralized dependency management (org common control)",
+  "onboardingPrTitle": "Enable centralized scanning (org common control)",
   "onboardingConfigFileName": "renovate.json",
   "onboardingConfig": {
     "extends": ["local>GSA-TTS/scanning-service:default.json5"]
