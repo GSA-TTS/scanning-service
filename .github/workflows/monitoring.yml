@@ -131,33 +131,36 @@ jobs:
           PROBLEM_REPOS=""
 
           for repo in $REPOS; do
-            # Check if repo has workflow files
-            HAS_WORKFLOWS=$(gh api "/repos/${repo}/contents/.github/workflows" \
-              --jq 'length' 2>/dev/null || echo "0")
+            TMPDIR=$(mktemp -d)
 
-            if [ "$HAS_WORKFLOWS" = "0" ]; then
+            # Download workflow files; skip repo if none found
+            URLS=$(gh api "/repos/${repo}/contents/.github/workflows" \
+              --jq '.[] | select(.name | endswith(".yml") or endswith(".yaml")) | .download_url' 2>/dev/null || true)
+
+            if [ -z "$URLS" ]; then
               NO_WORKFLOWS=$((NO_WORKFLOWS + 1))
+              rm -rf "$TMPDIR"
               continue
             fi
 
-            # Clone just the .github/workflows directory
-            TMPDIR=$(mktemp -d)
-            gh api "/repos/${repo}/contents/.github/workflows" \
-              --jq '.[] | select(.name | endswith(".yml") or endswith(".yaml")) | .download_url' 2>/dev/null | while read -r url; do
+            echo "$URLS" | while read -r url; do
               curl -sf "$url" -o "${TMPDIR}/$(basename "$url")" 2>/dev/null || true
             done
 
-            # Run zizmor
-            if ls "${TMPDIR}"/*.yml "${TMPDIR}"/*.yaml 2>/dev/null | head -1 > /dev/null 2>&1; then
-              if zizmor --format plain "${TMPDIR}/" > /dev/null 2>&1; then
-                CLEAN=$((CLEAN + 1))
-              else
-                ISSUES=$((ISSUES + 1))
-                SHORT_NAME=$(echo "$repo" | cut -d'/' -f2)
-                PROBLEM_REPOS="${PROBLEM_REPOS}\n- [${SHORT_NAME}](https://github.com/${repo})"
-              fi
-            else
+            # Check if any files were actually downloaded
+            if ! ls "${TMPDIR}"/*.yml "${TMPDIR}"/*.yaml > /dev/null 2>&1; then
               NO_WORKFLOWS=$((NO_WORKFLOWS + 1))
+              rm -rf "$TMPDIR"
+              continue
+            fi
+
+            # Run zizmor
+            if zizmor --format plain "${TMPDIR}/" > /dev/null 2>&1; then
+              CLEAN=$((CLEAN + 1))
+            else
+              ISSUES=$((ISSUES + 1))
+              SHORT_NAME=$(echo "$repo" | cut -d'/' -f2)
+              PROBLEM_REPOS="${PROBLEM_REPOS}\n- [${SHORT_NAME}](https://github.com/${repo})"
             fi
 
             rm -rf "$TMPDIR"
