@@ -1,4 +1,4 @@
-name: "zizmor SAST: GitHub Actions Security Analysis"
+name: "GitHub Actions Security Analysis"
 
 on:
   schedule:
