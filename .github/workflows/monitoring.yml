@@ -143,11 +143,12 @@ jobs:
             fi
 
             echo "$URLS" | while read -r url; do
-              curl -sf "$url" -o "${TMPDIR}/$(basename "$url")" 2>/dev/null || true
+              [ -n "$url" ] && curl -sf "$url" -o "${TMPDIR}/$(basename "$url")" 2>/dev/null || true
             done
 
             # Check if any files were actually downloaded
-            if ! ls "${TMPDIR}"/*.yml "${TMPDIR}"/*.yaml > /dev/null 2>&1; then
+            DOWNLOADED=$(find "$TMPDIR" -name '*.yml' -o -name '*.yaml' 2>/dev/null | head -1)
+            if [ -z "$DOWNLOADED" ]; then
               NO_WORKFLOWS=$((NO_WORKFLOWS + 1))
               rm -rf "$TMPDIR"
               continue
