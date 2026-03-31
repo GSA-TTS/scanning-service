@@ -17,6 +17,6 @@
   "onboardingPrTitle": "Enable centralized dependency management (org common control)",
   "onboardingConfigFileName": "renovate.json",
   "onboardingConfig": {
-    "extends": ["local>GSA-TTS/scanning-config"]
+    "extends": ["local>GSA-TTS/scanning-config:default.json5"]
   }
 }
