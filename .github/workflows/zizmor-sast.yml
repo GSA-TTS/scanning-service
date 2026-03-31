@@ -51,9 +51,8 @@ jobs:
                 - "**"
           ZIZMOR_CONFIG
 
-          # Fetch all non-archived repos
-          REPOS=$(gh api --paginate "/orgs/${ORG}/repos?type=all&per_page=100" \
-            --jq '.[] | select(.archived == false) | .full_name')
+          # Staged rollout: explicit repo list
+          REPOS="GSA-TTS/scanning-config GSA-TTS/pic-blm-cxworks GSA-TTS/spiff-arena GSA-TTS/spiffworkflow-connector GSA-TTS/terraform-cloudgov"
 
           SCANNED=0
           CLEAN=0
@@ -68,17 +67,10 @@ jobs:
             SHORT_NAME=$(echo "$repo" | cut -d'/' -f2)
 
             # Only scan repos that have opted in (merged the onboarding PR)
-            HAS_RENOVATE=$(gh api "/repos/${repo}/contents/renovate.json" --jq '.name' 2>/dev/null || true)
-            if [ -z "$HAS_RENOVATE" ]; then
-              HAS_RENOVATE=$(gh api "/repos/${repo}/contents/renovate.json5" --jq '.name' 2>/dev/null || true)
-            fi
-            if [ -z "$HAS_RENOVATE" ]; then
-              HAS_RENOVATE=$(gh api "/repos/${repo}/contents/.renovaterc" --jq '.name' 2>/dev/null || true)
-            fi
-            if [ -z "$HAS_RENOVATE" ]; then
-              HAS_RENOVATE=$(gh api "/repos/${repo}/contents/.renovaterc.json" --jq '.name' 2>/dev/null || true)
-            fi
-            if [ -z "$HAS_RENOVATE" ]; then
+            if ! gh api "/repos/${repo}/contents/renovate.json" > /dev/null 2>&1 && \
+               ! gh api "/repos/${repo}/contents/renovate.json5" > /dev/null 2>&1 && \
+               ! gh api "/repos/${repo}/contents/.renovaterc" > /dev/null 2>&1 && \
+               ! gh api "/repos/${repo}/contents/.renovaterc.json" > /dev/null 2>&1; then
               continue
             fi
 

@@ -29,11 +29,10 @@ jobs:
           echo "# Dependency Management Metrics — $TODAY" > metrics.md
           echo "" >> metrics.md
 
-          # Fetch all non-archived repos
-          echo "Fetching org repos..."
-          REPOS=$(gh api --paginate "/orgs/${ORG}/repos?type=all&per_page=100" \
-            --jq '.[] | select(.archived == false) | .full_name')
-          TOTAL_REPOS=$(echo "$REPOS" | wc -l | tr -d ' ')
+          # Staged rollout: explicit repo list
+          REPOS="GSA-TTS/scanning-config GSA-TTS/pic-blm-cxworks GSA-TTS/spiff-arena GSA-TTS/spiffworkflow-connector GSA-TTS/terraform-cloudgov"
+          TOTAL_REPOS=5
+          echo "Checking ${TOTAL_REPOS} repos..."
 
           # Count repos with renovate.json / renovate.json5 config
           ONBOARDED=0
@@ -122,8 +121,8 @@ jobs:
           echo "# SHA Pinning Audit — $TODAY" > pinning-audit.md
           echo "" >> pinning-audit.md
 
-          REPOS=$(gh api --paginate "/orgs/${ORG}/repos?type=all&per_page=100" \
-            --jq '.[] | select(.archived == false) | .full_name')
+          # Staged rollout: explicit repo list
+          REPOS="GSA-TTS/scanning-config GSA-TTS/pic-blm-cxworks GSA-TTS/spiff-arena GSA-TTS/spiffworkflow-connector GSA-TTS/terraform-cloudgov"
 
           CLEAN=0
           ISSUES=0
