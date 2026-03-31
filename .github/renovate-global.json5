@@ -18,9 +18,5 @@
   "onboardingConfigFileName": "renovate.json",
   "onboardingConfig": {
     "extends": ["local>GSA-TTS/scanning-config"]
-  },
-  "onboardingNotes": [
-    "## What this PR does\n\nThis enables the org's centralized dependency management — a **NIST 800-53 common control** covering CM-2, CM-3, SI-2, SI-7, SA-22, SR-3/4/11, RA-5, and IA-9.\n\nAfter merging, Renovate will:\n- SHA-pin all GitHub Actions refs (converting mutable tags to immutable commit hashes)\n- Create grouped PRs for dependency updates across all ecosystems\n- Flag abandoned packages and auto-migrate to known replacements\n- Create immediate PRs for known CVEs",
-    "## After merging\n\n1. Review the initial **Pin Dependencies** PR that Renovate will create\n2. Delete `dependabot.yml` from this repo (Renovate replaces all Dependabot version update functionality)\n3. Disable Dependabot security updates in repo Settings → Code security (or confirm this is handled at org level)\n4. Dependabot **alerts** remain active for the Security tab — do not disable those\n5. If this repo has a `vulnerability-sla-check.yml` workflow, you can delete it — the org now provides this centrally\n\nSee the [onboarding playbook](https://github.com/GSA-TTS/scanning-config/blob/main/docs/onboarding-playbook.md) for full instructions.\n\nFor OSCAL/SSP integration, see [compliance docs](https://github.com/GSA-TTS/scanning-config/blob/main/docs/compliance/README.md)."
-  ]
+  }
 }
