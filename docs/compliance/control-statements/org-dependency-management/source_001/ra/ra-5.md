@@ -102,7 +102,7 @@ ______________________________________________________________________
 
 ## Implementation for part c.
 
-The centralized vulnerability SLA tracker analyzes alert severity, age, and CISA KEV status weekly, producing a status report per repo posted to a tracking issue. Reports categorize alerts as on-track, approaching, or overdue against GSA remediation timelines.
+The centralized vulnerability SLA tracker analyzes alert severity, age, and CISA KEV status weekly. Onboarded repos (those with a `renovate.json` referencing the scanning service) automatically receive a per-repository tracking issue titled "Vulnerability SLA Report" that is created, updated, reopened, or closed as alerts change. The issue breaks down alerts by severity and SLA status (overdue, approaching, on-track) with direct links to each Dependabot alert and CISA KEV indicators. An org-wide summary report is also produced for centralized monitoring.
 
 ### Rules:
 
@@ -114,7 +114,7 @@ ______________________________________________________________________
 
 ## Implementation for part d.
 
-SLA thresholds enforce timely remediation per GSA CIO 2100.1: Critical/High 30 days, Medium 90 days, Low 180 days, CISA KEV 14 days per BOD 22-01. The weekly SLA report flags overdue alerts and approaching deadlines.
+SLA thresholds enforce timely remediation per GSA CIO 2100.1: Critical/High 30 days, Medium 90 days, Low 180 days, CISA KEV 14 days per BOD 22-01. The weekly SLA report flags overdue alerts and approaching deadlines. Per-repository tracking issues (opt-in) provide direct visibility to development teams, ensuring overdue vulnerabilities are surfaced where teams work.
 
 ### Rules:
 

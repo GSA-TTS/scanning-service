@@ -75,7 +75,7 @@ ______________________________________________________________________
 
 ## Implementation for part a.
 
-Renovate automatically detects when pinned dependencies have newer versions available (including security patches) and creates PRs. The vulnerabilityAlerts setting creates immediate PRs when GitHub Security Advisory alerts fire, bypassing the normal schedule window.
+Renovate automatically detects when pinned dependencies have newer versions available (including security patches) and creates PRs. The vulnerabilityAlerts setting creates immediate PRs when GitHub Security Advisory alerts fire, bypassing the normal schedule window. Onboarded repos automatically receive a per-repository tracking issue that reports all open Dependabot alerts by severity and SLA status, ensuring flaws are identified and reported directly in the repo's issue tracker.
 
 ### Rules:
 
@@ -99,7 +99,7 @@ ______________________________________________________________________
 
 ## Implementation for part c.
 
-The 2-day minimumReleaseAge ensures stability while the centralized vulnerability SLA tracker enforces GSA CIO 2100.1 remediation timelines (Critical/High 30d, Medium 90d, Low 180d, CISA KEV 14d). Weekly SLA reports flag overdue alerts.
+The 2-day minimumReleaseAge ensures stability while the centralized vulnerability SLA tracker enforces GSA CIO 2100.1 remediation timelines (Critical/High 30d, Medium 90d, Low 180d, CISA KEV 14d). Repos that opt in receive a per-repository tracking issue that is updated weekly with current SLA status, reopened automatically if new alerts appear after all-clear, and closed when no open alerts remain.
 
 ### Rules:
 

@@ -3,7 +3,7 @@
     "uuid": "9ce247c8-f6cf-4918-9a14-523696d90365",
     "metadata": {
       "title": "org-dependency-management Component Definition",
-      "last-modified": "2025-07-17T00:00:00.000000+00:00",
+      "last-modified": "2026-03-31T00:00:00.000000+00:00",
       "version": "1.0.0",
       "oscal-version": "1.1.2"
     },
@@ -259,7 +259,7 @@
                   {
                     "statement-id": "ra-5_smt.c",
                     "uuid": "714d16c9-a8cb-4a27-a258-2848dd370dc3",
-                    "description": "The centralized vulnerability SLA tracker analyzes alert severity, age, and CISA KEV status weekly, producing a status report per repo posted to a tracking issue. Reports categorize alerts as on-track, approaching, or overdue against GSA remediation timelines.",
+                    "description": "The centralized vulnerability SLA tracker analyzes alert severity, age, and CISA KEV status weekly. Onboarded repos (those with a renovate.json referencing the scanning service) automatically receive a per-repository tracking issue that is created, updated, reopened, or closed as alerts change. The issue breaks down alerts by severity and SLA status with direct links to each Dependabot alert and CISA KEV indicators. An org-wide summary report is also produced for centralized monitoring.",
                     "props": [
                       {
                         "name": "Rule_Id",
@@ -274,7 +274,7 @@
                   {
                     "statement-id": "ra-5_smt.d",
                     "uuid": "6db46bcd-a98b-4bf0-9c6e-91041a3ddc01",
-                    "description": "SLA thresholds enforce timely remediation per GSA CIO 2100.1: Critical/High 30 days, Medium 90 days, Low 180 days, CISA KEV 14 days per BOD 22-01. The weekly SLA report flags overdue alerts and approaching deadlines.",
+                    "description": "SLA thresholds enforce timely remediation per GSA CIO 2100.1: Critical/High 30 days, Medium 90 days, Low 180 days, CISA KEV 14 days per BOD 22-01. The weekly SLA report flags overdue alerts and approaching deadlines. Per-repository tracking issues (opt-in) provide direct visibility to development teams, ensuring overdue vulnerabilities are surfaced where teams work.",
                     "props": [
                       {
                         "name": "Rule_Id",
@@ -420,7 +420,7 @@
                   {
                     "statement-id": "si-2_smt.a",
                     "uuid": "e7c38b5d-9a14-4f6e-b823-5d0ac7e91f34",
-                    "description": "Renovate automatically detects when pinned dependencies have newer versions available (including security patches) and creates PRs. The vulnerabilityAlerts setting creates immediate PRs when GitHub Security Advisory alerts fire, bypassing the normal schedule window.",
+                    "description": "Renovate automatically detects when pinned dependencies have newer versions available (including security patches) and creates PRs. The vulnerabilityAlerts setting creates immediate PRs when GitHub Security Advisory alerts fire, bypassing the normal schedule window. Onboarded repos automatically receive a per-repository tracking issue that reports all open Dependabot alerts by severity and SLA status, ensuring flaws are identified and reported directly in the repo's issue tracker.",
                     "props": [
                       {
                         "name": "Rule_Id",
@@ -450,7 +450,7 @@
                   {
                     "statement-id": "si-2_smt.c",
                     "uuid": "a1b2c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
-                    "description": "The 2-day minimumReleaseAge ensures stability while the centralized vulnerability SLA tracker enforces GSA CIO 2100.1 remediation timelines (Critical/High 30d, Medium 90d, Low 180d, CISA KEV 14d). Weekly SLA reports flag overdue alerts.",
+                    "description": "The 2-day minimumReleaseAge ensures stability while the centralized vulnerability SLA tracker enforces GSA CIO 2100.1 remediation timelines (Critical/High 30d, Medium 90d, Low 180d, CISA KEV 14d). Repos that opt in receive a per-repository tracking issue that is updated weekly with current SLA status, reopened automatically if new alerts appear after all-clear, and closed when no open alerts remain.",
                     "props": [
                       {
                         "name": "Rule_Id",
