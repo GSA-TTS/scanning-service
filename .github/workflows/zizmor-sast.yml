@@ -35,6 +35,7 @@ jobs:
           ORG: ${{ github.repository_owner }}
           DRY_RUN: ${{ inputs.dry_run || 'false' }}
           ZIZMOR_GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          NO_COLOR: "1"
         run: |
           set -euo pipefail
 
