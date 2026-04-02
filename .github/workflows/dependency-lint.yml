@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
 
       - name: Install zizmor
         run: |
@@ -118,17 +120,21 @@ jobs:
 
       - name: Evaluate results
         if: inputs.fail-on-error
+        env:
+          ACTIONS_CLEAN: ${{ steps.actions-lint.outputs.actions_clean }}
+          LOCKFILES_CLEAN: ${{ steps.lockfile-check.outputs.lockfiles_clean }}
+          DOCKER_CLEAN: ${{ steps.docker-check.outputs.docker_clean }}
         run: |
           FAILED=false
-          if [ "${{ steps.actions-lint.outputs.actions_clean }}" = "false" ]; then
+          if [ "$ACTIONS_CLEAN" = "false" ]; then
             echo "::error::Unpinned GitHub Actions detected"
             FAILED=true
           fi
-          if [ "${{ steps.lockfile-check.outputs.lockfiles_clean }}" = "false" ]; then
+          if [ "$LOCKFILES_CLEAN" = "false" ]; then
             echo "::error::Missing lockfiles detected"
             FAILED=true
           fi
-          if [ "${{ steps.docker-check.outputs.docker_clean }}" = "false" ]; then
+          if [ "$DOCKER_CLEAN" = "false" ]; then
             echo "::error::Unpinned Docker images detected"
             FAILED=true
           fi
