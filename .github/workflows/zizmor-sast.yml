@@ -110,8 +110,8 @@ jobs:
               continue
             fi
 
-            # Try auto-fixing (safe fixes only)
-            FIX_OUTPUT=$(zizmor --config /tmp/zizmor.yml --fix \
+            # Try auto-fixing (safe + unsafe fixes; PRs go through human review)
+            FIX_OUTPUT=$(zizmor --config /tmp/zizmor.yml --fix=all \
               "$WORKDIR/.github/workflows/" 2>&1 || true)
 
             cd "$WORKDIR"
