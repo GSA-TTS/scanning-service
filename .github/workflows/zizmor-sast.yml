@@ -227,6 +227,7 @@ jobs:
               git checkout -b "$BRANCH"
               git add -A
               git commit -m "fix: apply zizmor safe auto-fixes for Actions security"
+              git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${repo}.git"
               git push origin "$BRANCH"
 
               gh pr create --repo "$repo" \
