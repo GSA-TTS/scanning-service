@@ -1,0 +1,81 @@
+name: "Secret Scan"
+description: "Scan for leaked secrets using gitleaks with the org's centralized configuration"
+
+inputs:
+  fail-on-error:
+    description: "Whether to fail on findings"
+    required: false
+    default: "false"
+  scan-mode:
+    description: "Scan mode: 'staged' for PR diff, 'full' for full repo"
+    required: false
+    default: "staged"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install gitleaks
+      shell: bash
+      run: |
+        set -euo pipefail
+        GITLEAKS_VERSION="8.30.1"
+        curl -sfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar xz
+        chmod +x gitleaks
+        sudo mv gitleaks /usr/local/bin/
+
+    - name: Download org gitleaks config
+      shell: bash
+      run: |
+        curl -sfL "https://raw.githubusercontent.com/${{ github.repository_owner }}/scanning-service/main/.gitleaks.toml" \
+          -o /tmp/gitleaks.toml
+
+    - name: Run gitleaks
+      id: gitleaks
+      shell: bash
+      continue-on-error: true
+      run: |
+        set -euo pipefail
+
+        echo "## Secret Scan Results" >> "$GITHUB_STEP_SUMMARY"
+
+        COMMON_ARGS=(--config=/tmp/gitleaks.toml --report-format=json --report-path=/tmp/gitleaks-report.json --verbose)
+
+        if [ "${{ inputs.scan-mode }}" = "full" ]; then
+          SCAN_ARGS=(detect --source=. "${COMMON_ARGS[@]}")
+        elif git rev-parse --verify origin/main >/dev/null 2>&1; then
+          # Full history available — scan only the PR diff
+          SCAN_ARGS=(detect --source=. --log-opts=origin/main..HEAD "${COMMON_ARGS[@]}")
+        else
+          # Shallow clone or no origin/main — fall back to working-tree scan
+          echo "::notice::origin/main not available (shallow clone?). Falling back to working-tree scan."
+          SCAN_ARGS=(detect --source=. --no-git "${COMMON_ARGS[@]}")
+        fi
+
+        if gitleaks "${SCAN_ARGS[@]}" 2>&1 | tee /tmp/gitleaks-output.txt; then
+          echo "No secrets detected." >> "$GITHUB_STEP_SUMMARY"
+          echo "findings=false" >> "$GITHUB_OUTPUT"
+        else
+          echo "**Potential secrets detected.** Review the findings below." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -f /tmp/gitleaks-report.json ]; then
+            FINDING_COUNT=$(jq 'length' /tmp/gitleaks-report.json)
+            echo "Found **${FINDING_COUNT}** potential secret(s)." >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            # Show rule IDs and file paths only — never echo actual secret values
+            jq -r '.[] | "- \(.RuleID): \(.File):\(.StartLine)"' /tmp/gitleaks-report.json >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          echo "findings=true" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Evaluate results
+      if: inputs.fail-on-error == 'true'
+      shell: bash
+      run: |
+        if [ "${{ steps.gitleaks.outputs.findings }}" = "true" ]; then
+          echo "::error::Secrets detected in source code. See job summary for details."
+          exit 1
+        fi

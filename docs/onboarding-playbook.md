@@ -1,6 +1,6 @@
-# Onboarding Playbook: Centralized Dependency Management
+# Onboarding Playbook: Centralized Scanning Service
 
-This guide walks teams through adopting the org's centralized dependency management service, which provides an **OSCAL component definition** covering CM-2, CM-3, CM-6, CM-7, IA-9, RA-5, SA-10, SA-11, SA-22, SI-2, SI-7, SR-3, SR-4, and SR-11.
+This guide walks teams through adopting the org's centralized scanning service, which provides dependency management, GitHub Actions SAST, and secret scanning. It ships an **OSCAL component definition** covering CM-2, CM-3, CM-6, CM-7, IA-5, IA-9, RA-5, SA-10, SA-11, SA-22, SC-12, SC-28, SI-2, SI-7, SR-3, SR-4, and SR-11.
 
 After onboarding, your system can import the component definition into its SSP and incorporate the provided control narratives directly into your system's own control documentation.
 
@@ -106,7 +106,37 @@ Results appear in the **Actions job summary** on each PR. Start with `fail-on-er
 
 > **Note:** The org also runs a centralized zizmor audit weekly across all repos — this PR check gives your team faster, per-PR feedback.
 
-### 8. Handle exceptions
+### 8. Add secret scanning to your CI (recommended)
+
+Add the org's secret scanning as a PR check. Same two options as the dependency lint:
+
+**Option A: Reusable workflow** — add a new workflow file:
+
+```yaml
+# .github/workflows/secret-scan.yml
+name: Secret Scan
+on: [pull_request]
+jobs:
+  scan:
+    uses: GSA-TTS/scanning-service/.github/workflows/secret-scan.yml@main
+    with:
+      fail-on-error: false  # advisory mode; set true to block PRs
+```
+
+**Option B: Composite action** — add a step to an existing workflow:
+
+```yaml
+- name: Secret scan
+  uses: GSA-TTS/scanning-service/.github/actions/secret-scan@main
+  with:
+    fail-on-error: "false"
+```
+
+Both use the org's centralized `.gitleaks.toml` config (fetched at runtime) to scan for leaked credentials, API keys, private keys, and cloud.gov service tokens. Results appear in the **Actions job summary** on each PR. Start with `fail-on-error: false` and switch to `true` once your repo is clean.
+
+> **Note:** The org also runs a centralized gitleaks audit weekly across all repos — this PR check gives your team faster, per-PR feedback.
+
+### 9. Handle exceptions
 
 If your repo legitimately needs a mutable branch ref (e.g., `uses: org/action@main`):
 
@@ -114,7 +144,54 @@ If your repo legitimately needs a mutable branch ref (e.g., `uses: org/action@ma
 2. Note the exception in your system's SSP under the relevant control (SI-7, SR-11)
 3. Accept the risk — the dependency lint workflow will flag this as advisory
 
-### 9. Verify SLA compliance
+### 10. Add a pre-commit hook for secret scanning (recommended)
+
+Catch secrets before they reach GitHub by running gitleaks locally on every commit.
+
+First, [install gitleaks](https://github.com/gitleaks/gitleaks?tab=readme-ov-file#installing). Then set up a git pre-commit hook that points at the org config:
+
+```bash
+# .githooks/pre-commit
+#!/usr/bin/env bash
+gitleaks detect --staged \
+  --config="https://raw.githubusercontent.com/GSA-TTS/scanning-service/main/.gitleaks.toml"
+```
+
+Make it executable and activate:
+
+```bash
+chmod +x .githooks/pre-commit
+git config core.hooksPath .githooks
+```
+
+**With [mise](https://mise.jdx.dev/):** If you use mise for tool management, you can wire this up as a mise task and generate the hook:
+
+```bash
+# In your mise.toml, add a pre-commit task:
+[tasks.pre-commit]
+run = 'gitleaks detect --staged --config="https://raw.githubusercontent.com/GSA-TTS/scanning-service/main/.gitleaks.toml"'
+
+# Then generate the hook:
+mise generate git-pre-commit --write --task=pre-commit
+```
+
+See [mise generate git-pre-commit](https://mise.jdx.dev/cli/generate/git-pre-commit.html) for details.
+
+**With [pre-commit](https://pre-commit.com/):** You can also use the pre-commit framework:
+
+```yaml
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+        args:
+          - --config
+          - https://raw.githubusercontent.com/GSA-TTS/scanning-service/main/.gitleaks.toml
+```
+
+### 11. Verify SLA compliance
 
 After onboarding, check that:
 
@@ -122,7 +199,7 @@ After onboarding, check that:
 - Weekly status comments reflect your open Dependabot alerts
 - Any overdue alerts are addressed within the SLA timeline
 
-### 10. Import the OSCAL component definition (for SSP documentation)
+### 12. Import the OSCAL component definition (for SSP documentation)
 
 If your system maintains an OSCAL-based SSP:
 
@@ -142,7 +219,7 @@ components:
 
 The next SSP assembly merges the component's control narratives alongside your system's own `### This System` sections.
 
-### 11. Document controls in your SSP
+### 13. Document controls in your SSP
 
 For each of the 14 controls covered by this component, your SSP should describe how your system uses the scanning service. Example language:
 
