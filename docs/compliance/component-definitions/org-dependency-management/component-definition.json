@@ -3,8 +3,8 @@
     "uuid": "9ce247c8-f6cf-4918-9a14-523696d90365",
     "metadata": {
       "title": "org-dependency-management Component Definition",
-      "last-modified": "2026-03-31T00:00:00.000000+00:00",
-      "version": "1.0.0",
+      "last-modified": "2026-04-06T00:00:00.000000+00:00",
+      "version": "1.1.0",
       "oscal-version": "1.1.2"
     },
     "components": [
@@ -12,7 +12,7 @@
         "uuid": "92fdf4df-49cf-4d1b-9762-c1610226fd53",
         "type": "service",
         "title": "org-dependency-management",
-        "description": "Centralized dependency management service providing SHA-pinned GitHub Actions, automated dependency updates via Renovate, vulnerability SLA tracking, supply chain integrity verification, and GitHub Actions SAST analysis via zizmor across the GSA-TTS GitHub org.",
+        "description": "Centralized dependency management service providing SHA-pinned GitHub Actions, automated dependency updates via Renovate, vulnerability SLA tracking, supply chain integrity verification, GitHub Actions SAST analysis via zizmor, and secret scanning via gitleaks across the GSA-TTS GitHub org.",
         "props": [
           {
             "name": "Rule_Id",
@@ -63,6 +63,16 @@
             "name": "Rule_Description",
             "value": "GitHub Actions workflows are scanned for security issues via centralized zizmor SAST analysis",
             "remarks": "rule_actions_sast_scanned"
+          },
+          {
+            "name": "Rule_Id",
+            "value": "secrets-scanned",
+            "remarks": "rule_secrets_scanned"
+          },
+          {
+            "name": "Rule_Description",
+            "value": "Source code is scanned for leaked secrets, credentials, and keys via centralized gitleaks configuration",
+            "remarks": "rule_secrets_scanned"
           }
         ],
         "control-implementations": [
@@ -204,6 +214,34 @@
               },
               {
                 "uuid": "6c32bf45-c6fc-4b89-abff-f70bc7aedd02",
+                "control-id": "ia-5",
+                "description": "",
+                "props": [
+                  {
+                    "name": "implementation-status",
+                    "value": "partial"
+                  }
+                ],
+                "statements": [
+                  {
+                    "statement-id": "ia-5_smt",
+                    "uuid": "a1b2c3d4-1111-4e5f-a6b7-000000000001",
+                    "description": "Centralized gitleaks scanning detects leaked authenticators (passwords, API keys, tokens, private keys) in source code repositories. The org-wide .gitleaks.toml configuration includes GSA-specific patterns for cloud.gov service keys, Cloud Foundry credentials, and Login.gov private key material. Weekly audits scan all onboarded repos, and per-PR checks prevent new secrets from being committed. Pre-commit hooks provide an additional layer of prevention before secrets reach the remote repository.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "secrets-scanned"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "f460e00b-ba2d-49c6-8642-00ccbe396580",
                 "control-id": "ia-9",
                 "description": "",
                 "props": [
@@ -345,7 +383,7 @@
                   {
                     "statement-id": "sa-11_smt.a",
                     "uuid": "7da1f265-5ba0-44f1-80eb-5bd0403d3c90",
-                    "description": "PR-based updates ensure that CI tests run against every dependency version change before it reaches the default branch. Merge decisions remain with each team, who are responsible for their own test quality. The PR review gate enforces that no dependency change bypasses the test pipeline. Centralized zizmor SAST analysis provides automated static security testing of GitHub Actions workflow definitions, detecting template injection, credential exposure, excessive permissions, and other security anti-patterns. Auto-fixable findings are remediated via PR; unfixable findings are reported via issue for manual review.",
+                    "description": "PR-based updates ensure that CI tests run against every dependency version change before it reaches the default branch. Merge decisions remain with each team, who are responsible for their own test quality. The PR review gate enforces that no dependency change bypasses the test pipeline. Centralized zizmor SAST analysis provides automated static security testing of GitHub Actions workflow definitions, detecting template injection, credential exposure, excessive permissions, and other security anti-patterns. Auto-fixable findings are remediated via PR; unfixable findings are reported via issue for manual review. Centralized gitleaks scanning provides automated secret detection across all onboarded repos, preventing credentials and keys from persisting in source code.",
                     "props": [
                       {
                         "name": "Rule_Id",
@@ -354,6 +392,10 @@
                       {
                         "name": "Rule_Id",
                         "value": "actions-sast-scanned"
+                      },
+                      {
+                        "name": "Rule_Id",
+                        "value": "secrets-scanned"
                       },
                       {
                         "name": "implementation-status",
@@ -493,7 +535,7 @@
                   {
                     "statement-id": "si-7_smt",
                     "uuid": "f4a5b6c7-8d9e-4f0a-b1c2-3d4e5f6a7b8c",
-                    "description": "SHA-256 commit hashes provide cryptographic integrity verification for all GitHub Actions dependencies. The exact code that was reviewed is the code that runs. Tag references (@v4) are mutable and can be force-pushed by upstream maintainers; SHA references cannot be altered without detection. The pinDigests setting enforces this automatically across all repos. Additionally, centralized zizmor SAST analysis detects template injection vulnerabilities where attacker-controlled inputs could be expanded into executable code, and identifies credential persistence risks where secrets may leak into logs or artifacts.",
+                    "description": "SHA-256 commit hashes provide cryptographic integrity verification for all GitHub Actions dependencies. The exact code that was reviewed is the code that runs. Tag references (@v4) are mutable and can be force-pushed by upstream maintainers; SHA references cannot be altered without detection. The pinDigests setting enforces this automatically across all repos. Additionally, centralized zizmor SAST analysis detects template injection vulnerabilities where attacker-controlled inputs could be expanded into executable code, and identifies credential persistence risks where secrets may leak into logs or artifacts. Centralized gitleaks scanning detects embedded secrets, credentials, and private keys that compromise source code integrity.",
                     "props": [
                       {
                         "name": "Rule_Id",
@@ -502,6 +544,10 @@
                       {
                         "name": "Rule_Id",
                         "value": "actions-sast-scanned"
+                      },
+                      {
+                        "name": "Rule_Id",
+                        "value": "secrets-scanned"
                       },
                       {
                         "name": "implementation-status",
@@ -590,6 +636,62 @@
                       {
                         "name": "Rule_Id",
                         "value": "actions-sast-scanned"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "c1d2e3f4-5a6b-4c7d-8e9f-0a1b2c3d4e50",
+                "control-id": "sc-12",
+                "description": "",
+                "props": [
+                  {
+                    "name": "implementation-status",
+                    "value": "partial"
+                  }
+                ],
+                "statements": [
+                  {
+                    "statement-id": "sc-12_smt",
+                    "uuid": "d2e3f4a5-6b7c-4d8e-9f0a-1b2c3d4e5f60",
+                    "description": "Centralized gitleaks scanning detects private keys (RSA, EC, PGP, SSH) and certificate material committed to source code repositories. The org-wide .gitleaks.toml configuration includes patterns for Login.gov IdP private keys and general private key material. This prevents cryptographic keys from being exposed in version control where they could be extracted by anyone with repository access.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "secrets-scanned"
+                      },
+                      {
+                        "name": "implementation-status",
+                        "value": "implemented"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "uuid": "e3f4a5b6-7c8d-4e9f-0a1b-2c3d4e5f6a70",
+                "control-id": "sc-28",
+                "description": "",
+                "props": [
+                  {
+                    "name": "implementation-status",
+                    "value": "partial"
+                  }
+                ],
+                "statements": [
+                  {
+                    "statement-id": "sc-28_smt",
+                    "uuid": "f4a5b6c7-8d9e-4f0a-1b2c-3d4e5f6a7b80",
+                    "description": "Centralized gitleaks scanning ensures that secrets, credentials, and cryptographic keys are not stored in plaintext in source code repositories. The centralized .gitleaks.toml configuration detects passwords, API keys, tokens, private keys, and cloud.gov service credentials across all onboarded repos. Weekly audits and per-PR checks enforce this continuously, with pre-commit hooks available for prevention before secrets reach the remote repository.",
+                    "props": [
+                      {
+                        "name": "Rule_Id",
+                        "value": "secrets-scanned"
                       },
                       {
                         "name": "implementation-status",

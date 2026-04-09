@@ -1,0 +1,61 @@
+# Centralized gitleaks configuration for the GSA-TTS GitHub org.
+#
+# Controls covered:
+#   IA-5  (Authenticator Management) — detects leaked credentials/keys in source code
+#   SC-12 (Cryptographic Key Establishment) — prevents private keys from being committed
+#   SC-28 (Protection of Information at Rest) — secrets are not stored in plaintext in repos
+#   SA-11 (Developer Testing and Evaluation) — security testing in the development pipeline
+#   SI-7  (Software, Firmware, and Information Integrity) — no embedded secrets in source
+#
+# Downstream repos use this config via:
+#   - CI: the reusable secret-scan workflow or composite action (fetches this automatically)
+#   - Pre-commit: gitleaks detect --staged --config=https://raw.githubusercontent.com/GSA-TTS/scanning-service/main/.gitleaks.toml
+#
+# gitleaks ships ~160 built-in rules covering AWS, GCP, Azure, GitHub tokens,
+# private keys, generic API keys, etc. This config extends the defaults with
+# GSA-specific patterns and org-wide allowlist tuning.
+#
+# WARNING: Disabling or weakening rules here removes secret detection for all
+# onboarded repos. Changes require PR review and update to the OSCAL component.
+
+title = "GSA-TTS centralized gitleaks configuration"
+
+# --- GSA-specific rules ---
+
+[[rules]]
+id = "cloudfoundry-service-key"
+description = "Cloud Foundry / cloud.gov service key JSON"
+regex = '''(?i)["']?vcap_services["']?\s*[:=]'''
+tags = ["cloud.gov", "cloudfoundry"]
+keywords = ["vcap_services"]
+
+[[rules]]
+id = "cloud-gov-cf-password"
+description = "Cloud Foundry CLI password or token"
+regex = '''(?i)CF_PASSWORD\s*[:=]\s*["']?[^\s"']+'''
+tags = ["cloud.gov", "cloudfoundry"]
+keywords = ["cf_password"]
+
+[[rules]]
+id = "login-gov-private-key"
+description = "Login.gov IdP private key material"
+regex = '''-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----'''
+tags = ["login.gov", "pki"]
+keywords = ["BEGIN", "PRIVATE KEY"]
+
+# --- Allowlists ---
+
+[allowlist]
+description = "Global allowlist for known false positives"
+
+# Test fixtures, documentation examples, and placeholder values
+paths = [
+  '''(?i)test[s]?/.*fixtures?/''',
+  '''(?i)spec/.*fixtures?/''',
+  '''(?i)\.gitleaks\.toml$''',
+]
+
+# Exclude common false-positive patterns
+regexes = [
+  '''(?i)EXAMPLE|CHANGEME|REPLACE_ME|YOUR_.*_HERE|TODO|PLACEHOLDER|xxxx''',
+]

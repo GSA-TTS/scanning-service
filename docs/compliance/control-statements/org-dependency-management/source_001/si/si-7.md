@@ -6,6 +6,9 @@ x-trestle-comp-def-rules:
     - name: actions-sast-scanned
       description: GitHub Actions workflows are scanned for security issues via 
         centralized zizmor SAST analysis
+    - name: secrets-scanned
+      description: Source code is scanned for leaked secrets, credentials, and 
+        keys via centralized gitleaks configuration
 x-trestle-param-values:
   si-7_prm_1:
   si-7_prm_2:
@@ -64,10 +67,13 @@ The `pinDigests` setting enforces this automatically across all repos.
 
 Beyond SHA pinning, centralized SAST analysis detects integrity threats specific to GitHub Actions workflows: template injection vulnerabilities where attacker-controlled inputs are expanded into executable code, credential persistence risks where secrets may leak into logs or artifacts, and `GITHUB_ENV` abuse that could allow code execution via environment variable injection. Findings are reported as issues or auto-fix PRs weekly.
 
+Centralized gitleaks scanning detects embedded secrets, credentials, and private keys that compromise source code integrity.
+
 ### Rules:
 
   - sha-pins-verified
   - actions-sast-scanned
+  - secrets-scanned
 
 ### Implementation Status: implemented
 
