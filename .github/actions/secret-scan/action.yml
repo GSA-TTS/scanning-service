@@ -10,6 +10,10 @@ inputs:
     description: "Scan mode: 'staged' for PR diff, 'full' for full repo"
     required: false
     default: "staged"
+  config-path:
+    description: "Path to a local gitleaks config file (skips downloading from main)"
+    required: false
+    default: ""
 
 runs:
   using: "composite"
@@ -24,10 +28,16 @@ runs:
         sudo mv gitleaks /usr/local/bin/
 
     - name: Download org gitleaks config
+      if: inputs.config-path == ''
       shell: bash
       run: |
         curl -sfL "https://raw.githubusercontent.com/${{ github.repository_owner }}/scanning-service/main/.gitleaks.toml" \
           -o /tmp/gitleaks.toml
+
+    - name: Use local gitleaks config
+      if: inputs.config-path != ''
+      shell: bash
+      run: cp "${{ inputs.config-path }}" /tmp/gitleaks.toml
 
     - name: Run gitleaks
       id: gitleaks
