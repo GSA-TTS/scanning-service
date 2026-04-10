@@ -20,7 +20,12 @@
 
 title = "GSA-TTS centralized gitleaks configuration"
 
-# --- GSA-specific rules ---
+# Extend the default gitleaks ruleset (~160 built-in rules for AWS, GCP,
+# Azure, GitHub tokens, private keys, generic API keys, etc.)
+[extend]
+useDefault = true
+
+# --- GSA-specific rules (added on top of defaults) ---
 
 [[rules]]
 id = "cloudfoundry-service-key"
