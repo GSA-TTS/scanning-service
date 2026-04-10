@@ -1,6 +1,6 @@
 {
   "component-definition": {
-    "uuid": "9ce247c8-f6cf-4918-9a14-523696d90365",
+    "uuid": "224d7877-94ea-4a32-bfb6-2a40c5f80097",
     "metadata": {
       "title": "org-dependency-management Component Definition",
       "last-modified": "2026-04-06T00:00:00.000000+00:00",
@@ -9,7 +9,7 @@
     },
     "components": [
       {
-        "uuid": "92fdf4df-49cf-4d1b-9762-c1610226fd53",
+        "uuid": "534ca2a4-b12b-4b73-bef7-437264057918",
         "type": "service",
         "title": "org-dependency-management",
         "description": "Centralized dependency management service providing SHA-pinned GitHub Actions, automated dependency updates via Renovate, vulnerability SLA tracking, supply chain integrity verification, GitHub Actions SAST analysis via zizmor, and secret scanning via gitleaks across the GSA-TTS GitHub org.",
@@ -77,12 +77,12 @@
         ],
         "control-implementations": [
           {
-            "uuid": "1a0acc2c-d87b-49f6-a0af-53b4a4655403",
+            "uuid": "86c617c8-ceb0-4ff4-b190-323cb6ed2af2",
             "source": "https://raw.githubusercontent.com/usnistgov/oscal-content/refs/tags/v1.3.0/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json",
             "description": "Controls implemented via the org-wide centralized dependency management service",
             "implemented-requirements": [
               {
-                "uuid": "2ec548f1-3eb9-46ef-86d4-2bd1ef0a4e48",
+                "uuid": "d9d0e22e-d2e8-4c45-8764-da2a31edd780",
                 "control-id": "cm-2",
                 "description": "",
                 "props": [
@@ -94,7 +94,7 @@
                 "statements": [
                   {
                     "statement-id": "cm-2_smt",
-                    "uuid": "85c0ddb5-a8fe-41b5-b689-e06e4068ef72",
+                    "uuid": "5f1bf6a5-8050-4481-b1ae-1c6873cfc8d3",
                     "description": "SHA-pinned workflow files and lockfiles establish a documented, reviewable baseline for CI/CD pipeline dependencies. Renovate PRs create an auditable change trail for each baseline update. The centralized preset ensures all repos maintain consistent baseline configuration for dependency management.",
                     "props": [
                       {
@@ -110,7 +110,7 @@
                 ]
               },
               {
-                "uuid": "f79c6f4a-5257-43fd-8de5-7d2a0b83026d",
+                "uuid": "7bcb306e-463d-4414-abee-5427db73ba33",
                 "control-id": "cm-3",
                 "description": "",
                 "props": [
@@ -122,8 +122,8 @@
                 "statements": [
                   {
                     "statement-id": "cm-3_smt.b",
-                    "uuid": "3deaa64f-e4cc-43d4-b1bb-0b0c3fe98cf6",
-                    "description": "All dependency version changes go through PR review — Renovate creates a PR, CI checks run, and a team member reviews and merges. The org-level lint check and optional ruleset enforce this gate. No ad-hoc version changes are possible once enforcement is active.",
+                    "uuid": "3803a3e3-6b18-4471-8789-a2ad00307630",
+                    "description": "All dependency version changes go through PR review \u2014 Renovate creates a PR, CI checks run, and a team member reviews and merges. The org-level lint check and optional ruleset enforce this gate. No ad-hoc version changes are possible once enforcement is active.",
                     "props": [
                       {
                         "name": "Rule_Id",
@@ -137,7 +137,7 @@
                   },
                   {
                     "statement-id": "cm-3_smt.f",
-                    "uuid": "4a0a02e7-a77a-4636-ac28-b0265a8c25a2",
+                    "uuid": "ae41e8bf-1e10-4dd3-aa69-d5962fd1a22d",
                     "description": "Renovate's weekly schedule, PR concurrency limits, and grouping rules provide controlled change windows. Changes are scheduled before 7am on weekdays, limited to 5 concurrent PRs and 1 per hour, ensuring changes are introduced in a controlled, reviewable manner.",
                     "props": [
                       {
@@ -153,7 +153,7 @@
                 ]
               },
               {
-                "uuid": "9de263a2-81c9-4630-bb5f-2347a2b76bc0",
+                "uuid": "4a5c4f34-fcc2-42ee-a878-1d0c8e41b6a1",
                 "control-id": "cm-6",
                 "description": "",
                 "props": [
@@ -165,7 +165,7 @@
                 "statements": [
                   {
                     "statement-id": "cm-6_smt.a",
-                    "uuid": "942ee610-a054-4ffc-92d2-53e9854f51a6",
+                    "uuid": "327d9b81-03d4-4277-909c-e9a17382a695",
                     "description": "The centralized Renovate preset (default.json5) defines mandatory configuration settings for all repos, with inline compliance annotations documenting which control parts each setting supports. Deviations require explicit overrides documented in the repo's renovate.json. The JSON5 format enables comments that make each setting's compliance significance visible to future editors.",
                     "props": [
                       {
@@ -181,7 +181,7 @@
                 ]
               },
               {
-                "uuid": "bb73cd7c-506a-497a-84ed-58e1f3fa7d00",
+                "uuid": "65be434f-f412-4b22-8a08-c952fa6a6fc6",
                 "control-id": "cm-7",
                 "description": "",
                 "props": [
@@ -193,8 +193,8 @@
                 "statements": [
                   {
                     "statement-id": "cm-7_smt.a",
-                    "uuid": "3ca7dbc8-ffcc-4e2d-8d30-e8baeee932b8",
-                    "description": "SHA pinning ensures repos use only the exact, reviewed version of each Action — not whatever a mutable tag (e.g., @v4 or @main) resolves to at any given moment. This reduces attack surface from mutable references and enforces least functionality for CI/CD pipeline dependencies. Centralized zizmor SAST analysis detects excessive permission scopes granted to workflow runners, flagging cases where permissions exceed what the workflow actually needs.",
+                    "uuid": "08d56b50-c1fe-45e2-bcaf-cc50494bc197",
+                    "description": "SHA pinning ensures repos use only the exact, reviewed version of each Action \u2014 not whatever a mutable tag (e.g., @v4 or @main) resolves to at any given moment. This reduces attack surface from mutable references and enforces least functionality for CI/CD pipeline dependencies. Centralized zizmor SAST analysis detects excessive permission scopes granted to workflow runners, flagging cases where permissions exceed what the workflow actually needs.",
                     "props": [
                       {
                         "name": "Rule_Id",
@@ -213,7 +213,7 @@
                 ]
               },
               {
-                "uuid": "6c32bf45-c6fc-4b89-abff-f70bc7aedd02",
+                "uuid": "b7cdea86-88d0-49fa-882e-0241fae632ed",
                 "control-id": "ia-5",
                 "description": "",
                 "props": [
@@ -225,7 +225,7 @@
                 "statements": [
                   {
                     "statement-id": "ia-5_smt",
-                    "uuid": "a1b2c3d4-1111-4e5f-a6b7-000000000001",
+                    "uuid": "5621a60d-80b9-420f-88e1-741cb3a2e338",
                     "description": "Centralized gitleaks scanning detects leaked authenticators (passwords, API keys, tokens, private keys) in source code repositories. The org-wide .gitleaks.toml configuration includes GSA-specific patterns for cloud.gov service keys, Cloud Foundry credentials, and Login.gov private key material. Weekly audits scan all onboarded repos, and per-PR checks prevent new secrets from being committed. Pre-commit hooks provide an additional layer of prevention before secrets reach the remote repository.",
                     "props": [
                       {
@@ -241,7 +241,7 @@
                 ]
               },
               {
-                "uuid": "f460e00b-ba2d-49c6-8642-00ccbe396580",
+                "uuid": "2d8b15cc-f305-41be-9998-55580a36174c",
                 "control-id": "ia-9",
                 "description": "",
                 "props": [
@@ -253,7 +253,7 @@
                 "statements": [
                   {
                     "statement-id": "ia-9_smt",
-                    "uuid": "f460e00b-ba2d-49c6-8642-00ccbe39658a",
+                    "uuid": "47f10593-7786-41ca-b25a-49e4ab81e087",
                     "description": "The GitHub App used by Renovate has scoped permissions (contents: write, pull-requests: write, workflows: write, metadata: read, vulnerability_alerts: read, issues: write) and provides an auditable identity for all automated PRs. This is distinct from human identities, enabling clear attribution of automated vs. manual dependency changes in the audit trail.",
                     "props": [
                       {
@@ -269,7 +269,7 @@
                 ]
               },
               {
-                "uuid": "1bf79ef7-5fdf-4f35-8be4-01541013a0a5",
+                "uuid": "fe934448-98d3-453e-bdac-94d1abc91851",
                 "control-id": "ra-5",
                 "description": "",
                 "props": [
@@ -281,7 +281,7 @@
                 "statements": [
                   {
                     "statement-id": "ra-5_smt.a",
-                    "uuid": "b55c4aba-f1ab-4466-9dcc-6253b68c4757",
+                    "uuid": "a8528f46-0642-4cc9-8916-af25d2d9f4ae",
                     "description": "Dependabot alerts scan all dependency ecosystems (npm, pip, Docker, Go, Terraform, bundler, GitHub Actions, etc.) for known vulnerabilities. Renovate's vulnerabilityAlerts setting creates immediate PRs when GitHub Security Advisory alerts fire, directly tying remediation PRs to CVEs. Together, these provide continuous vulnerability monitoring across all dependency types.",
                     "props": [
                       {
@@ -296,7 +296,7 @@
                   },
                   {
                     "statement-id": "ra-5_smt.c",
-                    "uuid": "714d16c9-a8cb-4a27-a258-2848dd370dc3",
+                    "uuid": "5909d8d0-2a48-4152-a30d-26978c059bd1",
                     "description": "The centralized vulnerability SLA tracker analyzes alert severity, age, and CISA KEV status weekly. Onboarded repos (those with a renovate.json referencing the scanning service) automatically receive a per-repository tracking issue that is created, updated, reopened, or closed as alerts change. The issue breaks down alerts by severity and SLA status with direct links to each Dependabot alert and CISA KEV indicators. An org-wide summary report is also produced for centralized monitoring.",
                     "props": [
                       {
@@ -311,7 +311,7 @@
                   },
                   {
                     "statement-id": "ra-5_smt.d",
-                    "uuid": "6db46bcd-a98b-4bf0-9c6e-91041a3ddc01",
+                    "uuid": "c4666778-454a-4e93-bf32-1ac12baeb311",
                     "description": "SLA thresholds enforce timely remediation per GSA CIO 2100.1: Critical/High 30 days, Medium 90 days, Low 180 days, CISA KEV 14 days per BOD 22-01. The weekly SLA report flags overdue alerts and approaching deadlines. Per-repository tracking issues (opt-in) provide direct visibility to development teams, ensuring overdue vulnerabilities are surfaced where teams work.",
                     "props": [
                       {
@@ -326,7 +326,7 @@
                   },
                   {
                     "statement-id": "ra-5_smt.f",
-                    "uuid": "777c659e-94ad-4723-9a93-d957aa0d07de",
+                    "uuid": "824272c8-f699-4754-a018-b092fdcf4eff",
                     "description": "Both Renovate and Dependabot automatically update their vulnerability databases. Renovate pulls the latest advisory data each run, and GitHub continuously updates the GitHub Advisory Database. No manual database maintenance is required.",
                     "props": [
                       {
@@ -342,7 +342,7 @@
                 ]
               },
               {
-                "uuid": "18819565-1966-44ea-834f-018d760c13aa",
+                "uuid": "77bbe1da-549d-47a5-9ddd-c51539c1534c",
                 "control-id": "sa-10",
                 "description": "",
                 "props": [
@@ -354,7 +354,7 @@
                 "statements": [
                   {
                     "statement-id": "sa-10_smt.c",
-                    "uuid": "b49253da-8bb7-4a19-95e4-b066e5129729",
+                    "uuid": "6c22f84e-a4a4-4ea7-a147-6f0c5be5a43e",
                     "description": "The org mandates that all CI/CD pipeline dependencies be tracked, versioned, and updated through a controlled process (Renovate + PR review). The lint check verifies compliance. SHA-pinned refs and lockfiles provide a complete manifest of external dependencies.",
                     "props": [
                       {
@@ -370,7 +370,7 @@
                 ]
               },
               {
-                "uuid": "bc59ab2b-b736-47ea-a1b2-cf89e2d770b6",
+                "uuid": "2dc26618-27d8-41f6-ba80-74c4baefd075",
                 "control-id": "sa-11",
                 "description": "",
                 "props": [
@@ -382,7 +382,7 @@
                 "statements": [
                   {
                     "statement-id": "sa-11_smt.a",
-                    "uuid": "7da1f265-5ba0-44f1-80eb-5bd0403d3c90",
+                    "uuid": "62babab7-4150-4f13-a7f1-252d27b1c9f1",
                     "description": "PR-based updates ensure that CI tests run against every dependency version change before it reaches the default branch. Merge decisions remain with each team, who are responsible for their own test quality. The PR review gate enforces that no dependency change bypasses the test pipeline. Centralized zizmor SAST analysis provides automated static security testing of GitHub Actions workflow definitions, detecting template injection, credential exposure, excessive permissions, and other security anti-patterns. Auto-fixable findings are remediated via PR; unfixable findings are reported via issue for manual review. Centralized gitleaks scanning provides automated secret detection across all onboarded repos, preventing credentials and keys from persisting in source code.",
                     "props": [
                       {
@@ -406,7 +406,7 @@
                 ]
               },
               {
-                "uuid": "43a686c5-04d4-42dc-81dd-e390efaec8b4",
+                "uuid": "7d683d6e-7352-4fa2-806a-645d348b7e69",
                 "control-id": "sa-22",
                 "description": "",
                 "props": [
@@ -418,7 +418,7 @@
                 "statements": [
                   {
                     "statement-id": "sa-22_smt.a",
-                    "uuid": "983ee0a0-9d69-46b2-b721-d4835b1599a5",
+                    "uuid": "ac228f2f-c293-4e9e-a050-a8f6d0430907",
                     "description": "The Renovate preset extends replacements:all, which automatically creates PRs to migrate when a dependency has a known successor (renamed, transferred to new org, or community-forked after abandonment). The abandonments:recommended preset flags packages with no release in 1 year. Together, these provide automated detection and remediation for unsupported components across all ecosystems (npm, pip, Docker, Go, Terraform, GitHub Actions, Maven, etc.).",
                     "props": [
                       {
@@ -433,7 +433,7 @@
                   },
                   {
                     "statement-id": "sa-22_smt.b",
-                    "uuid": "a65b2e3f-7c91-4d08-b5a0-9f3e81c24d67",
+                    "uuid": "70a530b7-fd61-460b-a361-d49f667833c8",
                     "description": "When abandonments:recommended flags a dependency and no replacements:all rule exists for it, the team evaluates alternatives. If no alternative exists and the component remains essential, teams document the decision to maintain/fork it and accept the risk. The monitoring dashboard tracks repos with open abandonment warnings to ensure timely resolution.",
                     "props": [
                       {
@@ -449,7 +449,7 @@
                 ]
               },
               {
-                "uuid": "d8f4a219-3b6e-4c5a-8e72-1a9bc0d53f48",
+                "uuid": "81080eb6-8aff-4850-8239-f467e4e7500d",
                 "control-id": "si-2",
                 "description": "",
                 "props": [
@@ -461,7 +461,7 @@
                 "statements": [
                   {
                     "statement-id": "si-2_smt.a",
-                    "uuid": "e7c38b5d-9a14-4f6e-b823-5d0ac7e91f34",
+                    "uuid": "382c38db-e488-4d8b-b781-42704fbf19c4",
                     "description": "Renovate automatically detects when pinned dependencies have newer versions available (including security patches) and creates PRs. The vulnerabilityAlerts setting creates immediate PRs when GitHub Security Advisory alerts fire, bypassing the normal schedule window. Onboarded repos automatically receive a per-repository tracking issue that reports all open Dependabot alerts by severity and SLA status, ensuring flaws are identified and reported directly in the repo's issue tracker.",
                     "props": [
                       {
@@ -476,7 +476,7 @@
                   },
                   {
                     "statement-id": "si-2_smt.b",
-                    "uuid": "c4d91f78-2e5a-4b39-a016-8f7d3ca52e90",
+                    "uuid": "9de01cb7-0855-4a9f-ad0c-f45455d3b7bb",
                     "description": "CI tests run against every dependency update PR before merge, validating that the flaw remediation does not break system functionality. Teams review test results before merging.",
                     "props": [
                       {
@@ -491,7 +491,7 @@
                   },
                   {
                     "statement-id": "si-2_smt.c",
-                    "uuid": "a1b2c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+                    "uuid": "0b7c594a-c7dd-4a55-a403-22ae8c0fde31",
                     "description": "The 2-day minimumReleaseAge ensures stability while the centralized vulnerability SLA tracker enforces GSA CIO 2100.1 remediation timelines (Critical/High 30d, Medium 90d, Low 180d, CISA KEV 14d). Repos that opt in receive a per-repository tracking issue that is updated weekly with current SLA status, reopened automatically if new alerts appear after all-clear, and closed when no open alerts remain.",
                     "props": [
                       {
@@ -506,8 +506,8 @@
                   },
                   {
                     "statement-id": "si-2_smt.d",
-                    "uuid": "b2c3d4e5-6f7a-4b8c-9d0e-1f2a3b4c5d6e",
-                    "description": "Dependency updates are incorporated into the organizational configuration management process — all changes go through Renovate PRs, CI validation, and team review before merging to the default branch.",
+                    "uuid": "bba2762d-1704-4a8b-a972-9f5150998a51",
+                    "description": "Dependency updates are incorporated into the organizational configuration management process \u2014 all changes go through Renovate PRs, CI validation, and team review before merging to the default branch.",
                     "props": [
                       {
                         "name": "Rule_Id",
@@ -522,7 +522,7 @@
                 ]
               },
               {
-                "uuid": "e3f4a5b6-7c8d-4e9f-a0b1-2c3d4e5f6a7b",
+                "uuid": "fad68037-e472-4938-a90b-0cfdd520221f",
                 "control-id": "si-7",
                 "description": "",
                 "props": [
@@ -534,7 +534,7 @@
                 "statements": [
                   {
                     "statement-id": "si-7_smt",
-                    "uuid": "f4a5b6c7-8d9e-4f0a-b1c2-3d4e5f6a7b8c",
+                    "uuid": "0d0f6e9d-1c6d-4fe0-8175-dc34f24ff933",
                     "description": "SHA-256 commit hashes provide cryptographic integrity verification for all GitHub Actions dependencies. The exact code that was reviewed is the code that runs. Tag references (@v4) are mutable and can be force-pushed by upstream maintainers; SHA references cannot be altered without detection. The pinDigests setting enforces this automatically across all repos. Additionally, centralized zizmor SAST analysis detects template injection vulnerabilities where attacker-controlled inputs could be expanded into executable code, and identifies credential persistence risks where secrets may leak into logs or artifacts. Centralized gitleaks scanning detects embedded secrets, credentials, and private keys that compromise source code integrity.",
                     "props": [
                       {
@@ -558,7 +558,7 @@
                 ]
               },
               {
-                "uuid": "57a4b8a1-2bed-41b2-ad4e-437c20331183",
+                "uuid": "be2db028-bd5f-4d82-b7ae-8744034c85dd",
                 "control-id": "sr-3",
                 "description": "",
                 "props": [
@@ -570,7 +570,7 @@
                 "statements": [
                   {
                     "statement-id": "sr-3_smt",
-                    "uuid": "ab1b474c-d9b1-4a25-ad4d-0d0784240230",
+                    "uuid": "0dca3baf-b913-4844-a0f6-710abb7b7cc7",
                     "description": "The org establishes a supply chain risk management process for CI/CD dependencies: centralized scanning (Renovate), version pinning (SHA), integrity verification (cryptographic hash), vulnerability monitoring (Dependabot alerts + SLA tracking), and automated remediation (Renovate PRs). This covers all dependency ecosystems, not just GitHub Actions.",
                     "props": [
                       {
@@ -586,7 +586,7 @@
                 ]
               },
               {
-                "uuid": "92567020-93fa-4609-be43-260dc379f5cf",
+                "uuid": "d4220853-27e1-4767-9bce-03c255fadc5e",
                 "control-id": "sr-4",
                 "description": "",
                 "props": [
@@ -598,7 +598,7 @@
                 "statements": [
                   {
                     "statement-id": "sr-4_smt",
-                    "uuid": "52e12f7c-c8a5-4397-a348-1c884b271025",
+                    "uuid": "08354594-1a2c-4ab1-bcf8-119896c656e1",
                     "description": "SHA pins create a verifiable chain from the exact upstream commit to the workflow that runs in the org's CI. Version comments (e.g., # v4.2.2) provide human-readable provenance alongside the machine-verifiable hash. The pinDigestsHelper setting adds these comments automatically.",
                     "props": [
                       {
@@ -614,7 +614,7 @@
                 ]
               },
               {
-                "uuid": "e9f0a1b2-3c4d-4e5f-a6b7-8c9d0e1f2a3b",
+                "uuid": "1f5346d8-66e1-4173-bb46-730a9293aa52",
                 "control-id": "sr-11",
                 "description": "",
                 "props": [
@@ -626,8 +626,8 @@
                 "statements": [
                   {
                     "statement-id": "sr-11_smt",
-                    "uuid": "f0a1b2c3-4d5e-4f6a-b7c8-9d0e1f2a3b4c",
-                    "description": "SHA pinning prevents tag-hijacking attacks where an attacker force-pushes a malicious commit to an existing tag. The SHA-256 hash guarantees the Action code matches what was originally reviewed. Centralized zizmor SAST analysis further detects ref-confusion and impostor commit risks — cases where ambiguous git references could resolve to unintended code. Together, SHA pinning and SAST scanning prevent counterfeit or tampered dependencies from entering the CI/CD pipeline.",
+                    "uuid": "89f2b555-de3a-4272-9a12-300c98b918eb",
+                    "description": "SHA pinning prevents tag-hijacking attacks where an attacker force-pushes a malicious commit to an existing tag. The SHA-256 hash guarantees the Action code matches what was originally reviewed. Centralized zizmor SAST analysis further detects ref-confusion and impostor commit risks \u2014 cases where ambiguous git references could resolve to unintended code. Together, SHA pinning and SAST scanning prevent counterfeit or tampered dependencies from entering the CI/CD pipeline.",
                     "props": [
                       {
                         "name": "Rule_Id",
@@ -646,7 +646,7 @@
                 ]
               },
               {
-                "uuid": "c1d2e3f4-5a6b-4c7d-8e9f-0a1b2c3d4e50",
+                "uuid": "5e7b81e9-9ff4-4666-968b-adf95fbeacb0",
                 "control-id": "sc-12",
                 "description": "",
                 "props": [
@@ -658,7 +658,7 @@
                 "statements": [
                   {
                     "statement-id": "sc-12_smt",
-                    "uuid": "d2e3f4a5-6b7c-4d8e-9f0a-1b2c3d4e5f60",
+                    "uuid": "16904c94-24b8-4445-a11d-e866ea47c936",
                     "description": "Centralized gitleaks scanning detects private keys (RSA, EC, PGP, SSH) and certificate material committed to source code repositories. The org-wide .gitleaks.toml configuration includes patterns for Login.gov IdP private keys and general private key material. This prevents cryptographic keys from being exposed in version control where they could be extracted by anyone with repository access.",
                     "props": [
                       {
@@ -674,7 +674,7 @@
                 ]
               },
               {
-                "uuid": "e3f4a5b6-7c8d-4e9f-0a1b-2c3d4e5f6a70",
+                "uuid": "9cc8d658-5aec-4252-8b4b-35ee6ded6761",
                 "control-id": "sc-28",
                 "description": "",
                 "props": [
@@ -686,7 +686,7 @@
                 "statements": [
                   {
                     "statement-id": "sc-28_smt",
-                    "uuid": "f4a5b6c7-8d9e-4f0a-1b2c-3d4e5f6a7b80",
+                    "uuid": "9890bbb7-884c-42dc-9408-861e3c82c57a",
                     "description": "Centralized gitleaks scanning ensures that secrets, credentials, and cryptographic keys are not stored in plaintext in source code repositories. The centralized .gitleaks.toml configuration detects passwords, API keys, tokens, private keys, and cloud.gov service credentials across all onboarded repos. Weekly audits and per-PR checks enforce this continuously, with pre-commit hooks available for prevention before secrets reach the remote repository.",
                     "props": [
                       {
