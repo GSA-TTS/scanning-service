@@ -31,7 +31,9 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           persist-credentials: false
-          sparse-checkout: .gitleaks.toml
+          sparse-checkout: |
+            .gitleaks.toml
+            bin/merge-gitleaks-config
           path: scanning-service
 
       - name: Install gitleaks
@@ -91,9 +93,17 @@ jobs:
               continue
             }
 
+            # Merge repo-local allowlist into org config if present
+            SCAN_CONFIG="$CONFIG"
+            if [ -f "$WORKDIR/.gitleaks.toml" ]; then
+              python3 "${GITHUB_WORKSPACE}/scanning-service/bin/merge-gitleaks-config" \
+                "$CONFIG" "$WORKDIR/.gitleaks.toml" /tmp/gitleaks-merged.toml
+              SCAN_CONFIG="/tmp/gitleaks-merged.toml"
+            fi
+
             # Run gitleaks (scan working tree, not history — history scan is expensive for weekly audits)
             REPORT_OUTPUT=$(gitleaks detect --source="$WORKDIR" --no-git \
-              --config="$CONFIG" --report-format=json --report-path=/tmp/gitleaks-report.json \
+              --config="$SCAN_CONFIG" --report-format=json --report-path=/tmp/gitleaks-report.json \
               --verbose 2>&1 || true)
 
             if [ ! -f /tmp/gitleaks-report.json ] || [ "$(jq 'length' /tmp/gitleaks-report.json 2>/dev/null)" = "0" ]; then
@@ -106,14 +116,16 @@ jobs:
             FINDING_COUNT=$(jq 'length' /tmp/gitleaks-report.json)
             FINDINGS=$((FINDINGS + 1))
 
-            # Format findings (rule IDs and file paths only — never include actual secret values)
-            FINDING_SUMMARY=$(jq -r '.[] | "- \(.RuleID): \(.File):\(.StartLine)"' /tmp/gitleaks-report.json)
+            # Format findings with GitHub source links (rule IDs and file paths only — never include actual secret values)
+            FINDING_SUMMARY=$(jq -r --arg workdir "$WORKDIR" --arg repo "$repo" \
+              '.[] | .File as $f | ($f | ltrimstr($workdir) | ltrimstr("/")) as $rel |
+              "- \(.RuleID): [\($rel)#L\(.StartLine)](https://github.com/\($repo)/blob/main/\($rel)#L\(.StartLine))"' \
+              /tmp/gitleaks-report.json)
 
             if [ "$DRY_RUN" = "true" ]; then
               echo "### ${SHORT_NAME} (${FINDING_COUNT} findings)" >> "$GITHUB_WORKSPACE/secret-scan-report.md"
-              echo '```' >> "$GITHUB_WORKSPACE/secret-scan-report.md"
+              echo "" >> "$GITHUB_WORKSPACE/secret-scan-report.md"
               echo "$FINDING_SUMMARY" >> "$GITHUB_WORKSPACE/secret-scan-report.md"
-              echo '```' >> "$GITHUB_WORKSPACE/secret-scan-report.md"
               echo "" >> "$GITHUB_WORKSPACE/secret-scan-report.md"
               rm -rf "$WORKDIR" /tmp/gitleaks-report.json
               continue
@@ -130,9 +142,7 @@ jobs:
           <details>
           <summary>Findings (${TODAY})</summary>
 
-          \`\`\`
           ${FINDING_SUMMARY}
-          \`\`\`
 
           </details>
 

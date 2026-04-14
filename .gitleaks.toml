@@ -37,7 +37,10 @@ keywords = ["vcap_services"]
 [[rules]]
 id = "cloud-gov-cf-password"
 description = "Cloud Foundry CLI password or token"
-regex = '''(?i)CF_PASSWORD\s*[:=]\s*["']?[^\s"']+'''
+# Match CF_PASSWORD= or CF_PASSWORD: followed by a literal value on the same line.
+# Use [^\S\n] (whitespace except newline) to prevent matching across lines.
+# Require 8+ word chars to catch real passwords, not short refs.
+regex = '''(?i)CF_PASSWORD[^\S\n]*[:=][^\S\n]*["']?[a-zA-Z0-9][^\s"']{7,}'''
 tags = ["cloud.gov", "cloudfoundry"]
 keywords = ["cf_password"]
 
@@ -63,5 +66,7 @@ paths = [
 
 # Exclude common false-positive patterns
 regexes = [
-  '''(?i)EXAMPLE|CHANGEME|REPLACE_ME|YOUR_.*_HERE|TODO|PLACEHOLDER|xxxx''',
+  '''(?i)EXAMPLE|CHANGEME|REPLACE_ME|YOUR_.*_HERE|TODO|PLACEHOLDER|xxxx|not-a-secret''',
+  # GitHub Actions variable references, Terraform interpolation/locals
+  '''\$\{\{|\$\{.*\}|local\.\w+\.\w+|secrets\.\w+|inputs\.\w+''',
 ]

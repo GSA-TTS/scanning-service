@@ -1,0 +1,59 @@
+#!/usr/bin/env python3
+"""Merge a repo-local .gitleaks.toml allowlist into the org-wide config.
+
+Usage: merge-gitleaks-config <org-config> <repo-local-config> <output>
+
+Appends 'paths' and 'regexes' array entries from the repo-local config
+into the corresponding arrays in the org config. Other sections in the
+repo-local file are ignored.
+"""
+import re
+import sys
+
+
+def merge_toml_arrays(org_text: str, local_text: str) -> str:
+    for key in ("paths", "regexes"):
+        m = re.search(
+            r"^" + key + r"\s*=\s*\[\s*\n(.*?)\n\s*\]",
+            local_text,
+            re.DOTALL | re.MULTILINE,
+        )
+        if not m:
+            continue
+        new_lines = m.group(1).strip()
+        if not new_lines:
+            continue
+        org_text = re.sub(
+            r"(^" + key + r"\s*=\s*\[.*?)(^\])",
+            lambda match: match.group(1).rstrip("\n")
+            + "\n  "
+            + new_lines
+            + "\n"
+            + match.group(2),
+            org_text,
+            count=1,
+            flags=re.DOTALL | re.MULTILINE,
+        )
+    return org_text
+
+
+def main() -> None:
+    if len(sys.argv) != 4:
+        print(f"Usage: {sys.argv[0]} <org-config> <local-config> <output>", file=sys.stderr)
+        sys.exit(1)
+
+    org_path, local_path, output_path = sys.argv[1], sys.argv[2], sys.argv[3]
+
+    with open(org_path) as f:
+        org_text = f.read()
+    with open(local_path) as f:
+        local_text = f.read()
+
+    merged = merge_toml_arrays(org_text, local_text)
+
+    with open(output_path, "w") as f:
+        f.write(merged)
+
+
+if __name__ == "__main__":
+    main()

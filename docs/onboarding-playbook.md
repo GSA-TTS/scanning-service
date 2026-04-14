@@ -134,6 +134,20 @@ jobs:
 
 Both use the org's centralized `.gitleaks.toml` config (fetched at runtime) to scan for leaked credentials, API keys, private keys, and cloud.gov service tokens. Results appear in the **Actions job summary** on each PR. Start with `fail-on-error: false` and switch to `true` once your repo is clean.
 
+**Repo-local overrides:** If your repo has false positives specific to your codebase (e.g., BPMN element IDs, local-dev-only credentials, build artifacts), create a `.gitleaks.toml` in your repo root with just the additional allowlist entries:
+
+```toml
+[allowlist]
+regexes = [
+  '''CorrelationKey_[0-9a-z]+''',
+]
+paths = [
+  '''build/dist/''',
+]
+```
+
+The scanning tools **automatically merge** your repo's `paths` and `regexes` arrays into the org config at scan time. You do not need to reproduce the org-wide rules or allowlists — only add your repo-specific entries.
+
 > **Note:** The org also runs a centralized gitleaks audit weekly across all repos — this PR check gives your team faster, per-PR feedback.
 
 ### 9. Handle exceptions
