@@ -106,14 +106,16 @@ jobs:
             FINDING_COUNT=$(jq 'length' /tmp/gitleaks-report.json)
             FINDINGS=$((FINDINGS + 1))
 
-            # Format findings (rule IDs and file paths only — never include actual secret values)
-            FINDING_SUMMARY=$(jq -r '.[] | "- \(.RuleID): \(.File):\(.StartLine)"' /tmp/gitleaks-report.json)
+            # Format findings with GitHub source links (rule IDs and file paths only — never include actual secret values)
+            FINDING_SUMMARY=$(jq -r --arg workdir "$WORKDIR" --arg repo "$repo" \
+              '.[] | .File as $f | ($f | ltrimstr($workdir) | ltrimstr("/")) as $rel |
+              "- \(.RuleID): [\($rel)#L\(.StartLine)](https://github.com/\($repo)/blob/main/\($rel)#L\(.StartLine))"' \
+              /tmp/gitleaks-report.json)
 
             if [ "$DRY_RUN" = "true" ]; then
               echo "### ${SHORT_NAME} (${FINDING_COUNT} findings)" >> "$GITHUB_WORKSPACE/secret-scan-report.md"
-              echo '```' >> "$GITHUB_WORKSPACE/secret-scan-report.md"
+              echo "" >> "$GITHUB_WORKSPACE/secret-scan-report.md"
               echo "$FINDING_SUMMARY" >> "$GITHUB_WORKSPACE/secret-scan-report.md"
-              echo '```' >> "$GITHUB_WORKSPACE/secret-scan-report.md"
               echo "" >> "$GITHUB_WORKSPACE/secret-scan-report.md"
               rm -rf "$WORKDIR" /tmp/gitleaks-report.json
               continue
@@ -130,9 +132,7 @@ jobs:
           <details>
           <summary>Findings (${TODAY})</summary>
 
-          \`\`\`
           ${FINDING_SUMMARY}
-          \`\`\`
 
           </details>
 
