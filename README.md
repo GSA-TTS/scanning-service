@@ -49,4 +49,5 @@ This capability covers 17 NIST 800-53 controls across 7 families (CM, IA, RA, SA
 | `.github/actions/secret-scan/action.yml` | Composite action wrapper for secret scanning |
 | `.github/actions/dependency-check/action.yml` | Composite action wrapper for dependency checks |
 | `.gitleaks.toml` | Centralized gitleaks config with GSA-specific rules |
+| `bin/merge-gitleaks-config` | Merges repo-local `.gitleaks.toml` allowlists into the org config |
 | `docs/compliance/component-definitions/org-dependency-management/component-definition.json` | Distributable OSCAL artifact |

@@ -33,6 +33,12 @@ runs:
       run: |
         curl -sfL "https://raw.githubusercontent.com/${{ github.repository_owner }}/scanning-service/main/.gitleaks.toml" \
           -o /tmp/gitleaks.toml
+        # Merge repo-local allowlist if present
+        if [ -f .gitleaks.toml ]; then
+          curl -sfL "https://raw.githubusercontent.com/${{ github.repository_owner }}/scanning-service/main/bin/merge-gitleaks-config" \
+            -o /tmp/merge-gitleaks-config
+          python3 /tmp/merge-gitleaks-config /tmp/gitleaks.toml .gitleaks.toml /tmp/gitleaks.toml
+        fi
 
     - name: Use local gitleaks config
       if: inputs.config-path != ''
