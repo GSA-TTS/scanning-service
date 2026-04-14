@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+# Usage: bin/test-gitleaks-config [config-path]
+#
+# Tests that the gitleaks configuration:
+#   1. Suppresses known false-positive patterns (regression)
+#   2. Still detects real secrets (accuracy)
+#
+# Exit codes:
+#   0 — all checks pass
+#   1 — a check failed (regression or missed detection)
+
+set -euo pipefail
+
+CONFIG="${1:-.gitleaks.toml}"
+WORK_DIR="tmp/gitleaks-config-test"
+PASS=0
+FAIL=0
+
+cleanup() { rm -rf "$WORK_DIR"; }
+trap cleanup EXIT
+mkdir -p "$WORK_DIR"
+
+# ── helpers ──────────────────────────────────────────────────────────────────
+
+pass() { echo "  ✓ $1"; PASS=$(( PASS + 1 )); }
+fail() { echo "  ✗ $1"; FAIL=$(( FAIL + 1 )); }
+
+# Run gitleaks on a directory; returns 0 if NO leaks found.
+scan() {
+  gitleaks detect \
+    --source="$1" --no-git \
+    --config="$CONFIG" \
+    --report-format=json --report-path="$WORK_DIR/report.json" \
+    --verbose 2>&1
+}
+
+# ── false-positive fixtures (should NOT trigger findings) ────────────────────
+
+create_false_positive_fixtures() {
+  local d="$WORK_DIR/fp"
+  mkdir -p "$d"
+
+  # CF_PASSWORD across lines — should not match "description" on the next line
+  cat > "$d/cf-password-multiline.yml" << 'EOF'
+cf_password:
+    description: The Cloud Foundry password argument
+    required: true
+EOF
+
+  # Terraform / shell interpolation references
+  cat > "$d/interpolation-refs.sh" << 'EOF'
+CF_PASSWORD=${var.cf_password}
+DB_HOST=${local.database.hostname}
+EOF
+
+  # Placeholder "not-a-secret" values
+  cat > "$d/placeholders.env" << 'EOF'
+CLIENT_SECRET=local-dev-astro-bff-not-a-secret
+BACKEND_SECRET=local-dev-spiff-backend-not-a-secret
+EOF
+
+  # PEM headers in sed/grep/awk commands (not actual key material)
+  cat > "$d/pem-strip.sh" << 'EOF'
+#!/usr/bin/env bash
+sed '/-----BEGIN PRIVATE KEY-----/d;/-----END PRIVATE KEY-----/d' "$pemPath" | tr -d '\n'
+grep -q '-----BEGIN RSA PRIVATE KEY-----' "$keyfile" && echo "has key"
+awk '/-----BEGIN PRIVATE KEY-----/,/-----END PRIVATE KEY-----/' "$pemPath"
+EOF
+
+  # VCAP_SERVICES variable references in Python code
+  cat > "$d/vcap-variable-refs.py" << 'EOF'
+import os, json, logging
+logger = logging.getLogger(__name__)
+vcap_services = os.getenv("VCAP_SERVICES")
+if not vcap_services:
+    return None
+services = json.loads(vcap_services)
+logger.warning(f"Error processing VCAP_SERVICES: {e}")
+EOF
+}
+
+# ── real-secret fixtures (SHOULD trigger findings) ───────────────────────────
+
+create_real_secret_fixtures() {
+  local d="$WORK_DIR/real"
+  mkdir -p "$d"
+
+  # AWS access key (matches built-in aws-access-token rule)
+  echo 'AKIAIOSFODNN7FAKEIDN' > "$d/aws-key.env"
+
+  # Actual PEM private key block (matches private-key / login-gov-private-key)
+  cat > "$d/real-key.pem" << 'EOF'
+-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC7o4qne60TB3pN
+qrLMPMJnMKBm7CLfHjdZmQ8u1+70vVb5RYQJ4s0qJp/s/bPHEzH3oQ0mYqV7qvN
+-----END PRIVATE KEY-----
+EOF
+
+  # Real VCAP_SERVICES JSON (matches cloudfoundry-service-key)
+  cat > "$d/vcap-leak.txt" << 'EOF'
+VCAP_SERVICES={"s3": [{"credentials": {"access_key_id": "AKIA..."}}]}
+EOF
+}
+
+# ── run tests ────────────────────────────────────────────────────────────────
+
+echo "==> Checking config: $CONFIG"
+echo ""
+
+# 1. False positives
+echo "--- False-positive suppression ---"
+create_false_positive_fixtures
+if scan "$WORK_DIR/fp" > /dev/null; then
+  pass "All false-positive patterns correctly suppressed"
+else
+  fail "Regression — gitleaks flagged patterns that should be allowed:"
+  jq -r '.[] | "       \(.RuleID): \(.File):\(.StartLine) — secret=\(.Secret)"' \
+    "$WORK_DIR/report.json" 2>/dev/null || true
+fi
+
+# 2. Real secrets
+echo "--- Real-secret detection ---"
+create_real_secret_fixtures
+if scan "$WORK_DIR/real" > /dev/null; then
+  fail "gitleaks did NOT detect planted secrets — config may be suppressing too much"
+else
+  count="$(jq 'length' "$WORK_DIR/report.json" 2>/dev/null || echo 0)"
+  pass "Detected $count finding(s) from planted secrets"
+fi
+
+# ── summary ──────────────────────────────────────────────────────────────────
+
+echo ""
+echo "==> $PASS passed, $FAIL failed"
+
+if (( FAIL > 0 )); then
+  exit 1
+fi

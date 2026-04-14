@@ -62,6 +62,7 @@ paths = [
   '''(?i)spec/.*fixtures?/''',
   '''(?i)\.gitleaks\.toml$''',
   '''(?i)secret-scan-test\.yml$''',
+  '''(?i)bin/test-gitleaks-config$''',
 ]
 
 # Exclude common false-positive patterns
