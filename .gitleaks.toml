@@ -30,9 +30,19 @@ useDefault = true
 [[rules]]
 id = "cloudfoundry-service-key"
 description = "Cloud Foundry / cloud.gov service key JSON"
-regex = '''(?i)["']?vcap_services["']?\s*[:=]'''
+# Require a JSON object value (starting with { or a quoted {) after the assignment.
+# This avoids matching Python variable references like `vcap_services = os.getenv(...)`.
+regex = '''(?i)["']?vcap_services["']?\s*[:=]\s*["']?\{'''
 tags = ["cloud.gov", "cloudfoundry"]
 keywords = ["vcap_services"]
+
+  [rules.allowlist]
+  description = "Log messages and f-strings referencing VCAP_SERVICES"
+  regexTarget = "line"
+  regexes = [
+    '''(?i)(logger|log|logging)\.\w+\(.*vcap_services''',
+    '''(?i)(print|warn|error|info|debug)\(.*vcap_services''',
+  ]
 
 [[rules]]
 id = "cloud-gov-cf-password"
@@ -50,6 +60,13 @@ description = "Login.gov IdP private key material"
 regex = '''-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----'''
 tags = ["login.gov", "pki"]
 keywords = ["BEGIN", "PRIVATE KEY"]
+
+  [rules.allowlist]
+  description = "PEM header/footer patterns in shell text-processing commands"
+  regexTarget = "line"
+  regexes = [
+    '''\b(sed|grep|awk|perl)\b.*-----BEGIN''',
+  ]
 
 # --- Allowlists ---
 
@@ -70,4 +87,6 @@ regexes = [
   '''(?i)EXAMPLE|CHANGEME|REPLACE_ME|YOUR_.*_HERE|TODO|PLACEHOLDER|xxxx|not-a-secret''',
   # GitHub Actions variable references, Terraform interpolation/locals
   '''\$\{\{|\$\{.*\}|local\.\w+\.\w+|secrets\.\w+|inputs\.\w+''',
+  # PEM header inside sed/awk address delimiters (not actual key material)
+  '''-----BEGIN[^-]*KEY-----/''',
 ]
