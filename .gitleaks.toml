@@ -66,7 +66,7 @@ paths = [
 
 # Exclude common false-positive patterns
 regexes = [
-  '''(?i)EXAMPLE|CHANGEME|REPLACE_ME|YOUR_.*_HERE|TODO|PLACEHOLDER|xxxx''',
+  '''(?i)EXAMPLE|CHANGEME|REPLACE_ME|YOUR_.*_HERE|TODO|PLACEHOLDER|xxxx|not-a-secret''',
   # GitHub Actions variable references, Terraform interpolation/locals
   '''\$\{\{|\$\{.*\}|local\.\w+\.\w+|secrets\.\w+|inputs\.\w+''',
 ]
