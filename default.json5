@@ -29,6 +29,11 @@
   // enforce remediation speed separately.
   "minimumReleaseAge": "2 days", // SI-2: stabilization before PR creation
 
+  // When updating a dependency, also bump the lower bound in manifest files
+  // (e.g., pyproject.toml, package.json) to match the resolved version.
+  // Without this, only lock files are updated and manifests drift.
+  "rangeStrategy": "bump",
+
   // Immediate PRs for known CVEs — bypasses schedule window.
   // Disabling this delays remediation and weakens SI-2c/RA-5d SLA compliance.
   "vulnerabilityAlerts": {
