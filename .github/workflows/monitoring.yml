@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Generate GitHub App token
         id: app-token
-        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3
+        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
         with:
           app-id: ${{ secrets.RENOVATE_APP_ID }} # zizmor: ignore[secrets-outside-env]
           private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env]
@@ -88,7 +88,7 @@ jobs:
           cat metrics.md
 
       - name: Upload metrics artifact
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: dependency-metrics-${{ github.run_id }}
           path: metrics.md
@@ -100,7 +100,7 @@ jobs:
     steps:
       - name: Generate GitHub App token
         id: app-token
-        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3
+        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
         with:
           app-id: ${{ secrets.RENOVATE_APP_ID }} # zizmor: ignore[secrets-outside-env]
           private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env]
@@ -186,7 +186,7 @@ jobs:
           cat pinning-audit.md
 
       - name: Upload pinning audit
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: sha-pinning-audit-${{ github.run_id }}
           path: pinning-audit.md
