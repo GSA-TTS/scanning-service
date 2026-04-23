@@ -5,13 +5,8 @@
 
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "autodiscover": true,
-  "autodiscoverFilter": [
-    "GSA-TTS/scanning-service",
-    "GSA-TTS/pic-blm-cxworks",
-    "GSA-TTS/spiff-arena",
-    "GSA-TTS/spiffworkflow-connector",
-    "GSA-TTS/terraform-cloudgov"
-  ],
+  // autodiscoverFilter is set at runtime from .github/repos.txt
+  // via the RENOVATE_AUTODISCOVER_FILTER env var in renovate.yml.
 
   // --- Onboarding PR customization ---
   "onboardingPrTitle": "Enable centralized scanning service",

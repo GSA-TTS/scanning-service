@@ -35,10 +35,18 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Build repo filter
+        id: repos
+        run: |
+          # Convert repos.txt lines to a JSON array for Renovate's autodiscoverFilter
+          FILTER=$(jq -Rc '[inputs | select(. != "")]' .github/repos.txt)
+          echo "filter=${FILTER}" >> "$GITHUB_OUTPUT"
+
       - name: Run Renovate
         uses: renovatebot/github-action@3633cede7d4d4598438e654eac4a695e46004420 # v46.1.7
         env:
           RENOVATE_TOKEN: ${{ steps.app-token.outputs.token }}
+          RENOVATE_AUTODISCOVER_FILTER: ${{ steps.repos.outputs.filter }}
           RENOVATE_DRY_RUN: ${{ inputs.dry_run == true && 'lookup' || 'null' }}
           LOG_LEVEL: info
         with:
