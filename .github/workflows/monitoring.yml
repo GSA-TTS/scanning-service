@@ -31,9 +31,9 @@ jobs:
           echo "# Dependency Management Metrics — $TODAY" > metrics.md
           echo "" >> metrics.md
 
-          # Staged rollout: explicit repo list
-          REPOS="GSA-TTS/scanning-service GSA-TTS/pic-blm-cxworks GSA-TTS/spiff-arena GSA-TTS/spiffworkflow-connector GSA-TTS/terraform-cloudgov"
-          TOTAL_REPOS=5
+          # Repo list is single-sourced from .github/repos.txt
+          REPOS=$(gh api "/repos/${GITHUB_REPOSITORY}/contents/.github/repos.txt" --jq '.content' | base64 -d | tr '\n' ' ')
+          TOTAL_REPOS=$(echo $REPOS | wc -w | tr -d ' ')
           echo "Checking ${TOTAL_REPOS} repos..."
 
           # Count repos with renovate.json / renovate.json5 config
@@ -123,8 +123,8 @@ jobs:
           echo "# SHA Pinning Audit — $TODAY" > pinning-audit.md
           echo "" >> pinning-audit.md
 
-          # Staged rollout: explicit repo list
-          REPOS="GSA-TTS/scanning-service GSA-TTS/pic-blm-cxworks GSA-TTS/spiff-arena GSA-TTS/spiffworkflow-connector GSA-TTS/terraform-cloudgov"
+          # Repo list is single-sourced from .github/repos.txt
+          REPOS=$(gh api "/repos/${GITHUB_REPOSITORY}/contents/.github/repos.txt" --jq '.content' | base64 -d | tr '\n' ' ')
 
           CLEAN=0
           ISSUES=0

@@ -57,8 +57,8 @@ jobs:
           ISSUE_PREFIX="gitleaks: secret scanning findings"
           CONFIG="${GITHUB_WORKSPACE}/scanning-service/.gitleaks.toml"
 
-          # Staged rollout: explicit repo list
-          REPOS="GSA-TTS/scanning-service GSA-TTS/pic-blm-cxworks GSA-TTS/spiff-arena GSA-TTS/spiffworkflow-connector GSA-TTS/terraform-cloudgov"
+          # Repo list is single-sourced from .github/repos.txt
+          REPOS=$(gh api "/repos/${GITHUB_REPOSITORY}/contents/.github/repos.txt" --jq '.content' | base64 -d | tr '\n' ' ')
 
           SCANNED=0
           CLEAN=0
