@@ -3,4 +3,5 @@ GSA-TTS/pic-blm-cxworks
 GSA-TTS/spiff-arena
 GSA-TTS/spiffworkflow-connector
 GSA-TTS/terraform-cloudgov
+GSA-TTS/pic-ce-explorer
 GSA-TTS/searchgov-spider
