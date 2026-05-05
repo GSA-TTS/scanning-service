@@ -32,9 +32,14 @@ jobs:
         with:
           persist-credentials: false
           sparse-checkout: |
+            .github/actions/repo-list
+            .github/repos.txt
             .gitleaks.toml
             bin/merge-gitleaks-config
-          path: scanning-service
+
+      - name: Load repository list
+        id: repo-list
+        uses: ./.github/actions/repo-list
 
       - name: Install gitleaks
         run: |
@@ -55,10 +60,10 @@ jobs:
           TODAY=$(date -u +%Y-%m-%d)
           LABEL="secret-scan"
           ISSUE_PREFIX="gitleaks: secret scanning findings"
-          CONFIG="${GITHUB_WORKSPACE}/scanning-service/.gitleaks.toml"
+          CONFIG="${GITHUB_WORKSPACE}/.gitleaks.toml"
 
           # Repo list is single-sourced from .github/repos.txt
-          REPOS=$(gh api "/repos/${GITHUB_REPOSITORY}/contents/.github/repos.txt" --jq '.content' | base64 -d | tr '\n' ' ')
+          REPOS="${{ steps.repo-list.outputs.repos }}"
 
           SCANNED=0
           CLEAN=0

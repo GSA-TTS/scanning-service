@@ -20,6 +20,18 @@ jobs:
           private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env]
           owner: ${{ github.repository_owner }}
 
+      - name: Checkout repo list action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            .github/actions/repo-list
+            .github/repos.txt
+
+      - name: Load repository list
+        id: repo-list
+        uses: ./.github/actions/repo-list
+
       - name: Collect metrics
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
@@ -32,7 +44,7 @@ jobs:
           echo "" >> metrics.md
 
           # Repo list is single-sourced from .github/repos.txt
-          REPOS=$(gh api "/repos/${GITHUB_REPOSITORY}/contents/.github/repos.txt" --jq '.content' | base64 -d | tr '\n' ' ')
+          REPOS="${{ steps.repo-list.outputs.repos }}"
           TOTAL_REPOS=$(echo $REPOS | wc -w | tr -d ' ')
           echo "Checking ${TOTAL_REPOS} repos..."
 
@@ -106,11 +118,23 @@ jobs:
           private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env]
           owner: ${{ github.repository_owner }}
 
+      - name: Checkout repo list action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            .github/actions/repo-list
+            .github/repos.txt
+
       - name: Install zizmor
         run: |
           curl -sfL https://github.com/woodruffw/zizmor/releases/latest/download/zizmor-x86_64-unknown-linux-gnu.tar.gz | tar xz
           chmod +x zizmor
           sudo mv zizmor /usr/local/bin/
+
+      - name: Load repository list
+        id: repo-list
+        uses: ./.github/actions/repo-list
 
       - name: Scan repos for unpinned Actions
         env:
@@ -124,7 +148,7 @@ jobs:
           echo "" >> pinning-audit.md
 
           # Repo list is single-sourced from .github/repos.txt
-          REPOS=$(gh api "/repos/${GITHUB_REPOSITORY}/contents/.github/repos.txt" --jq '.content' | base64 -d | tr '\n' ' ')
+          REPOS="${{ steps.repo-list.outputs.repos }}"
 
           CLEAN=0
           ISSUES=0

@@ -25,6 +25,18 @@ jobs:
           private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env]
           owner: ${{ github.repository_owner }}
 
+      - name: Checkout repo list action
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            .github/actions/repo-list
+            .github/repos.txt
+
+      - name: Load repository list
+        id: repo-list
+        uses: ./.github/actions/repo-list
+
       - name: Install zizmor
         run: |
           curl -sfL https://github.com/woodruffw/zizmor/releases/latest/download/zizmor-x86_64-unknown-linux-gnu.tar.gz | tar xz
@@ -50,7 +62,7 @@ jobs:
           printf 'rules:\n  unpinned-uses:\n    disable: true\n' > /tmp/zizmor.yml
 
           # Repo list is single-sourced from .github/repos.txt
-          REPOS=$(gh api "/repos/${GITHUB_REPOSITORY}/contents/.github/repos.txt" --jq '.content' | base64 -d | tr '\n' ' ')
+          REPOS="${{ steps.repo-list.outputs.repos }}"
 
           SCANNED=0
           CLEAN=0

@@ -1,0 +1,38 @@
+name: "Repository List"
+description: "Load a cleaned repository list from repos.txt for workflow reuse"
+
+inputs:
+  repo-file:
+    description: "Path to the repos.txt file"
+    required: false
+    default: ".github/repos.txt"
+
+outputs:
+  repos:
+    description: "Space-delimited repository list"
+    value: ${{ steps.load.outputs.repos }}
+  filter:
+    description: "JSON array of repositories"
+    value: ${{ steps.load.outputs.filter }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Load repository list
+      id: load
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        FILTER=$(awk '
+          {
+            sub(/\r$/, "")
+            gsub(/^[[:space:]]+|[[:space:]]+$/, "")
+          }
+          /^[[:space:]]*($|#)/ { next }
+          { print }
+        ' "${{ inputs.repo-file }}" | jq -Rsc 'split("\n") | map(select(length > 0))')
+        REPOS=$(echo "$FILTER" | jq -r 'join(" ")')
+
+        echo "repos=${REPOS}" >> "$GITHUB_OUTPUT"
+        echo "filter=${FILTER}" >> "$GITHUB_OUTPUT"
