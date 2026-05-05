@@ -162,13 +162,20 @@ If your repo legitimately needs a mutable branch ref (e.g., `uses: org/action@ma
 
 Catch secrets before they reach GitHub by running gitleaks locally on every commit.
 
-First, [install gitleaks](https://github.com/gitleaks/gitleaks?tab=readme-ov-file#installing). Then set up a git pre-commit hook that points at the org config:
+First, [install gitleaks](https://github.com/gitleaks/gitleaks?tab=readme-ov-file#installing).  However, since Gitleaks does not yet support remote config files, you must download the org config to your project root:
+
+```bash
+curl -sfL "https://raw.githubusercontent.com/GSA-TTS/scanning-service/main/.gitleaks.toml" -o .gitleaks.toml
+```
+
+If using an altername name or location, you must use the `-c/--config` option for all subsequent pre-commit steps.
+
+Next, set up a git pre-commit hook that points at the org config:
 
 ```bash
 # .githooks/pre-commit
 #!/usr/bin/env bash
-gitleaks detect --staged \
-  --config="https://raw.githubusercontent.com/GSA-TTS/scanning-service/main/.gitleaks.toml"
+gitleaks detect --staged 
 ```
 
 Make it executable and activate:
@@ -183,7 +190,7 @@ git config core.hooksPath .githooks
 ```bash
 # In your mise.toml, add a pre-commit task:
 [tasks.pre-commit]
-run = 'gitleaks detect --staged --config="https://raw.githubusercontent.com/GSA-TTS/scanning-service/main/.gitleaks.toml"'
+run = 'gitleaks detect --staged'
 
 # Then generate the hook:
 mise generate git-pre-commit --write --task=pre-commit
@@ -200,9 +207,6 @@ repos:
     rev: v8.30.1
     hooks:
       - id: gitleaks
-        args:
-          - --config
-          - https://raw.githubusercontent.com/GSA-TTS/scanning-service/main/.gitleaks.toml
 ```
 
 ### 11. Verify SLA compliance
