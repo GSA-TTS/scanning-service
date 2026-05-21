@@ -22,9 +22,6 @@ x-trestle-global:
 
 # cm-6 - \[Configuration Management\] Configuration Settings
 
-## Implementation Evidence
-
-- Renovate dependency management is centrally configured to pin all dependencies to exact versions ("rangeStrategy": "pin") in scanning-service/default.json5. This ensures configuration settings for dependencies are managed, verified, and reproducible.
 
 ## Control Statement
 

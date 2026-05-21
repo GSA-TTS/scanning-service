@@ -32,9 +32,6 @@ x-trestle-global:
 
 # si-7 - \[System and Information Integrity\] Software, Firmware, and Information Integrity
 
-## Implementation Evidence
-
-- Renovate dependency management is centrally configured to pin all dependencies to exact versions ("rangeStrategy": "pin") in scanning-service/default.json5. This ensures cryptographic integrity, provenance, and reproducibility of all managed software dependencies.
 
 ## Control Statement
 

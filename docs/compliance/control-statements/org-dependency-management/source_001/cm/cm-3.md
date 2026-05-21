@@ -24,9 +24,6 @@ x-trestle-global:
 
 # cm-3 - \[Configuration Management\] Configuration Change Control
 
-## Implementation Evidence
-
-- Renovate dependency management is centrally configured to pin all dependencies to exact versions ("rangeStrategy": "pin") in scanning-service/default.json5. This supports automated and auditable configuration change control for all managed dependencies.
 
 ## Control Statement
 
