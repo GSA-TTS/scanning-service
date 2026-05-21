@@ -29,10 +29,12 @@
   // enforce remediation speed separately.
   "minimumReleaseAge": "2 days", // SI-2: stabilization before PR creation
 
-  // When updating a dependency, also bump the lower bound in manifest files
-  // (e.g., pyproject.toml, package.json) to match the resolved version.
-  // Without this, only lock files are updated and manifests drift.
-  "rangeStrategy": "bump",
+  // When updating a dependency, pin to the exact resolved version in manifest files
+  // (e.g., pyproject.toml, package.json) for full reproducibility and supply chain integrity.
+  // SI-7, SR-4, SR-11, CM-7: Pinning ensures cryptographic integrity and provenance.
+  // CM-2, CM-3, CM-6, SA-10: Supports baseline/config management and change control.
+  // See also: https://docs.renovatebot.com/dependency-pinning/
+  "rangeStrategy": "pin",
 
   // Immediate PRs for known CVEs — bypasses schedule window.
   // Disabling this delays remediation and weakens SI-2c/RA-5d SLA compliance.
