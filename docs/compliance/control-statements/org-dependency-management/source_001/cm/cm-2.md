@@ -6,7 +6,7 @@ x-trestle-comp-def-rules:
         extends the org preset
 x-trestle-add-props:
   - name: implementation-evidence
-    value: Renovate dependency management is centrally configured to pin all dependencies to exact versions ("rangeStrategy": "pin") in scanning-service/default.json5. This ensures automated, reproducible, and controlled baseline configurations for all onboarded systems.
+    value: "Renovate dependency management is centrally configured to pin all dependencies to exact versions ('rangeStrategy': 'pin') in scanning-service/default.json5. This ensures automated, reproducible, and controlled baseline configurations for all onboarded systems."
 x-trestle-param-values:
   cm-02_odp.01:
   cm-02_odp.02:
