@@ -8,7 +8,7 @@ x-trestle-comp-def-rules:
         centralized zizmor SAST analysis
 x-trestle-add-props:
   - name: implementation-evidence
-    value: Renovate dependency management is centrally configured to pin all dependencies to exact versions ("rangeStrategy": "pin") in scanning-service/default.json5. This supports software integrity and control over authorized software in all managed systems.
+    value: "Renovate dependency management is centrally configured to pin all dependencies to exact versions ('rangeStrategy': 'pin') in scanning-service/default.json5. This supports software integrity and control over authorized software in all managed systems."
 x-trestle-param-values:
   cm-7_prm_2:
   cm-07_odp.01:
