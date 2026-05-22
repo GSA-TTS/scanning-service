@@ -10,8 +10,17 @@ x-trestle-comp-def-rules:
       description: Source code is scanned for leaked secrets, credentials, and 
         keys via centralized gitleaks configuration
 x-trestle-add-props:
-  - name: implementation-evidence
-    value: "Renovate dependency management is centrally configured to pin all dependencies to exact versions ('rangeStrategy': 'pin') in scanning-service/default.json5. This ensures cryptographic integrity, provenance, and reproducibility of all managed software dependencies."
+  # Add or modify control properties here
+  # Properties may be at the control or part level
+  # Add control level properties like this:
+  #   - name: ac1_new_prop
+  #     value: new property value
+  #
+  # Add properties to a statement part like this, where "b." is the label of the target statement part
+  #   - name: ac1_new_prop
+  #     value: new property value
+  #     smt-part: b.
+  #
 x-trestle-param-values:
   si-7_prm_1:
   si-7_prm_2:
@@ -31,7 +40,6 @@ x-trestle-global:
 ---
 
 # si-7 - \[System and Information Integrity\] Software, Firmware, and Information Integrity
-
 
 ## Control Statement
 
