@@ -5,8 +5,17 @@ x-trestle-comp-def-rules:
       description: The system repo has merged the Renovate onboarding PR and 
         extends the org preset
 x-trestle-add-props:
-  - name: implementation-evidence
-    value: "Renovate dependency management is centrally configured to pin all dependencies to exact versions ('rangeStrategy': 'pin') in scanning-service/default.json5. This ensures automated, reproducible, and controlled baseline configurations for all onboarded systems."
+  # Add or modify control properties here
+  # Properties may be at the control or part level
+  # Add control level properties like this:
+  #   - name: ac1_new_prop
+  #     value: new property value
+  #
+  # Add properties to a statement part like this, where "b." is the label of the target statement part
+  #   - name: ac1_new_prop
+  #     value: new property value
+  #     smt-part: b.
+  #
 x-trestle-param-values:
   cm-02_odp.01:
   cm-02_odp.02:
@@ -20,10 +29,6 @@ x-trestle-global:
 ---
 
 # cm-2 - \[Configuration Management\] Baseline Configuration
-
-## Implementation Evidence
-
-- Renovate dependency management is centrally configured to pin all dependencies to exact versions ("rangeStrategy": "pin") in scanning-service/default.json5. This ensures automated, reproducible, and controlled baseline configurations for all onboarded systems.
 
 ## Control Statement
 

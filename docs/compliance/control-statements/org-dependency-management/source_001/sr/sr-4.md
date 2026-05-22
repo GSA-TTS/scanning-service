@@ -4,8 +4,17 @@ x-trestle-comp-def-rules:
     - name: sha-pins-verified
       description: 'All GitHub Actions uses: refs in the repo are SHA-pinned'
 x-trestle-add-props:
-  - name: implementation-evidence
-    value: "Renovate dependency management is centrally configured to pin all dependencies to exact versions ('rangeStrategy': 'pin') in scanning-service/default.json5. This provides documented provenance and traceability for all managed dependencies."
+  # Add or modify control properties here
+  # Properties may be at the control or part level
+  # Add control level properties like this:
+  #   - name: ac1_new_prop
+  #     value: new property value
+  #
+  # Add properties to a statement part like this, where "b." is the label of the target statement part
+  #   - name: ac1_new_prop
+  #     value: new property value
+  #     smt-part: b.
+  #
 x-trestle-param-values:
   sr-04_odp:
 x-trestle-global:
@@ -40,10 +49,6 @@ ______________________________________________________________________
 ## What is the solution and how is it implemented?
 
 <!-- For implementation status enter one of: implemented, partial, planned, alternative, not-applicable -->
-
-## Implementation Evidence
-
-- Renovate dependency management is centrally configured to pin all dependencies to exact versions ("rangeStrategy": "pin") in scanning-service/default.json5. This provides documented provenance and traceability for all managed dependencies.
 
 <!-- Note that the list of rules under ### Rules: is read-only and changes will not be captured after assembly to JSON -->
 
