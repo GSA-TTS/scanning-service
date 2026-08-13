@@ -1,0 +1,2 @@
+# Keep this directory tracked. Actual reports (latest.md / latest.json) are
+# gitignored because they are generated locally from the (redacted) corpus.
