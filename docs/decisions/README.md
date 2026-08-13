@@ -10,6 +10,7 @@ ADRs[^1] record significant decisions along with their context and consequences.
 |-----|-------|--------|------|
 | [ADR-0001](0001-adopt-an-adr-process.md) | Adopt an ADR process | Accepted | 2025-02-23 |
 | [ADR-0002](0002-centralize-dependency-management.md) | Centralize dependency management and CI/CD security scanning | Accepted | 2026-03-26 |
+| [ADR-0003](0003-exclude-saas-backed-secret-scanners-from-benchmark.md) | Exclude SaaS-backed secret scanners from the benchmark | Proposed | 2026-08-13 |
 
 ## Creating a new ADR
 
