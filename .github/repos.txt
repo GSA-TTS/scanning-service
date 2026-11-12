@@ -19,3 +19,6 @@ GSA-TTS/searchgov-spider
 
 # Federal Procurement Data Fabric (FPDF)
 GSA-TTS/TTSE-petrified-forest-pipeline
+
+# Common Regulatory Systems Platform (CRSP)
+GSA-TTS/crsp-app
