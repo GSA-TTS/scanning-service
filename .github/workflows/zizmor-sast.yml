@@ -128,8 +128,9 @@ jobs:
               continue
             fi
 
-            # Try auto-fixing (safe + unsafe fixes; PRs go through human review)
-            zizmor --config /tmp/zizmor.yml --fix=all \
+            # Apply only zizmor's safe fixes. Unsafe findings, including
+            # self-repository rewrites, remain in the generated PR for review.
+            zizmor --config /tmp/zizmor.yml --fix=safe \
               "$WORKDIR/.github/workflows/" || true
 
             cd "$WORKDIR"
@@ -232,6 +233,8 @@ jobs:
           \`\`\`
 
           ${REMAINING_SECTION}
+
+          Unsafe fixes are not applied automatically. Review the remaining findings before making any manual changes.
 
           See [zizmor's audit documentation](https://docs.zizmor.sh/audits/) for details on each finding type.
 
