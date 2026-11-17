@@ -1,0 +1,25 @@
+name: zizmor Issue Reporting Self-Test
+on:
+  pull_request:
+    paths:
+      - ".github/scripts/zizmor_issue.py"
+      - ".github/workflows/zizmor-sast.yml"
+      - ".github/workflows/zizmor-issue-test.yml"
+      - "test/test_zizmor_issue.py"
+  push:
+    branches: [main]
+    paths:
+      - ".github/scripts/zizmor_issue.py"
+      - ".github/workflows/zizmor-sast.yml"
+      - ".github/workflows/zizmor-issue-test.yml"
+      - "test/test_zizmor_issue.py"
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - run: python3 -m unittest discover -s test -p 'test_zizmor_issue.py' -v
