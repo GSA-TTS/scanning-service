@@ -11,8 +11,7 @@ runs:
   using: "composite"
   steps:
     - name: Install zizmor
-      shell: bash
-      run: "${{ github.action_path }}/../install-zizmor/install-zizmor.sh"
+      uses: $/.github/actions/install-zizmor
 
     - name: Check GitHub Actions SHA pinning
       id: actions-lint
