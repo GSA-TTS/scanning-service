@@ -33,7 +33,9 @@ class TokenScopeTests(unittest.TestCase):
             "vulnerability-sla": [{"contents": "read", "vulnerability-alerts": "read", "issues": "write"}],
             "zizmor-sast": [{"contents": "write", "workflows": "write", "pull-requests": "write", "issues": "write"}],
             "oscal-update-consumers": [{"contents": "write", "pull-requests": "write"}],
-            "renovate": [{}],  # #32 remains open pending installation grant inventory.
+            "renovate": [{"contents": "write", "workflows": "write", "issues": "write",
+                          "pull-requests": "write", "statuses": "write",
+                          "vulnerability-alerts": "read"}],
         }
         for workflow, profiles in expected.items():
             text = (ROOT / f".github/workflows/{workflow}.yml").read_text()
