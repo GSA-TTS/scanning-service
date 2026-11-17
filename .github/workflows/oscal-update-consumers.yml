@@ -14,7 +14,7 @@ jobs:
       matrix:
         # Add repos that import the org-dependency-management component definition
         consumer:
-          - GSA-TTS/pic-blm-cxworks
+          - pic-blm-cxworks
           # Add more repos here as they adopt the component definition
       fail-fast: false
     steps:
@@ -26,11 +26,13 @@ jobs:
           private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env]
           owner: ${{ github.repository_owner }}
           repositories: ${{ matrix.consumer }}
+          permission-contents: write
+          permission-pull-requests: write
 
       - name: Checkout consumer repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          repository: ${{ matrix.consumer }}
+          repository: ${{ github.repository_owner }}/${{ matrix.consumer }}
           token: ${{ steps.app-token.outputs.token }}
           persist-credentials: false
 
@@ -77,7 +79,7 @@ jobs:
         if: steps.changes.outputs.has_changes == 'true'
         uses: ./_scanning-service/.github/actions/signed-commit
         with:
-          repository: ${{ matrix.consumer }}
+          repository: ${{ github.repository_owner }}/${{ matrix.consumer }}
           branch: chore/update-org-dependency-management-${{ github.event.release.tag_name }}
           commit-message: "chore: update org-dependency-management component definition to ${{ github.event.release.tag_name }}"
           token: ${{ steps.app-token.outputs.token }}

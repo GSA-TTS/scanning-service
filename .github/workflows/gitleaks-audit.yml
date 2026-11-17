@@ -18,15 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: write  # upload-artifact
+      contents: read # Bootstrap the repository list without the App token.
     steps:
-      - name: Generate GitHub App token
-        id: app-token
-        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
-        with:
-          app-id: ${{ secrets.RENOVATE_APP_ID }} # zizmor: ignore[secrets-outside-env]
-          private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env]
-          owner: ${{ github.repository_owner }}
-
       - name: Checkout scanning-service for config
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -40,6 +33,17 @@ jobs:
       - name: Load repository list
         id: repo-list
         uses: ./.github/actions/repo-list
+
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
+        with:
+          app-id: ${{ secrets.RENOVATE_APP_ID }} # zizmor: ignore[secrets-outside-env]
+          private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env]
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ steps.repo-list.outputs.token-repositories }}
+          permission-contents: read
+          permission-issues: write
 
       - name: Install gitleaks
         run: |

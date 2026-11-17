@@ -5,6 +5,8 @@
 
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "autodiscover": true,
+  // Monitoring identifies dependency PRs by this prefix as well as App author.
+  "branchPrefix": "renovate/",
   // autodiscoverFilter is set at runtime from .github/repos.txt
   // via the RENOVATE_AUTODISCOVER_FILTER env var in renovate.yml.
 
