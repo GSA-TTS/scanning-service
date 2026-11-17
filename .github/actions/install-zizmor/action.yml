@@ -1,0 +1,9 @@
+name: "Install zizmor"
+description: "Install the Renovate-managed zizmor CLI for GitHub-hosted Linux runners"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install zizmor
+      shell: bash
+      run: "${{ github.action_path }}/install-zizmor.sh"

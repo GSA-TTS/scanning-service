@@ -19,15 +19,7 @@ jobs:
           persist-credentials: false
 
       - name: Install zizmor
-        run: |
-          set -euo pipefail
-          ZIZMOR_VERSION="1.32.0"
-          ZIZMOR_SHA256="bb110cc765eca9cd7efb2e284a956be5974c60027b0970f16397d86208a9957b"
-          curl -sfL "https://github.com/woodruffw/zizmor/releases/download/v${ZIZMOR_VERSION}/zizmor-x86_64-unknown-linux-gnu.tar.gz" -o zizmor.tar.gz
-          echo "${ZIZMOR_SHA256}  zizmor.tar.gz" | sha256sum --check
-          tar xzf zizmor.tar.gz
-          chmod +x zizmor
-          sudo mv zizmor /usr/local/bin/
+        uses: ./.github/actions/install-zizmor
 
       - name: Check GitHub Actions SHA pinning
         id: actions-lint
@@ -42,9 +34,11 @@ jobs:
               echo "All Actions refs are SHA-pinned." >> "$GITHUB_STEP_SUMMARY"
               echo "actions_clean=true" >> "$GITHUB_OUTPUT"
             else
-              echo '```' >> "$GITHUB_STEP_SUMMARY"
-              cat zizmor-output.txt >> "$GITHUB_STEP_SUMMARY"
-              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              {
+                echo '```'
+                cat zizmor-output.txt
+                echo '```'
+              } >> "$GITHUB_STEP_SUMMARY"
               echo "actions_clean=false" >> "$GITHUB_OUTPUT"
             fi
           else
@@ -116,10 +110,12 @@ jobs:
             echo "All Docker FROM lines are digest-pinned (or no Dockerfiles found)." >> "$GITHUB_STEP_SUMMARY"
             echo "docker_clean=true" >> "$GITHUB_OUTPUT"
           else
-            echo "Unpinned Docker images:" >> "$GITHUB_STEP_SUMMARY"
-            echo '```' >> "$GITHUB_STEP_SUMMARY"
-            echo "$UNPINNED" >> "$GITHUB_STEP_SUMMARY"
-            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            {
+              echo "Unpinned Docker images:"
+              echo '```'
+              echo "$UNPINNED"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
             echo "docker_clean=false" >> "$GITHUB_STEP_SUMMARY"
           fi
 

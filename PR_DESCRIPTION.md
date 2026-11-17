@@ -4,13 +4,14 @@ The centralized scanning workflows downloaded zizmor from a mutable `latest` rel
 
 ## Changes
 
-- Pin all zizmor installations to `v1.32.0` and verify the published Linux x86_64 artifact SHA-256 before extraction.
+- Replace four duplicated zizmor installers with one local composite action.
+- Pin `zizmor` to `v1.32.0` and verify the published Linux x86_64 artifact SHA-256 before extraction.
 - Update `renovatebot/github-action` from `v46.1.7` to `v46.3.14`, retaining its full commit-SHA pin.
 - Leave gitleaks at `v8.30.1`; it is already the latest release.
 
 ## Review focus
 
-Routine dependency update. Review the zizmor release URL and checksum (`bb110cc765eca9cd7efb2e284a956be5974c60027b0970f16397d86208a9957b`) in the four installation sites.
+Review the reusable installer action. The official `zizmorcore/zizmor-action` cannot replace it because this service needs the `zizmor` CLI for per-repository report and `--fix=all` invocations. The version and published asset checksum are deliberately updated together; Renovate cannot update the checksum atomically.
 
 <details>
 <summary>Verification</summary>
@@ -19,27 +20,27 @@ Passed:
 
 ```text
 git diff --check
-zizmor v1.32.0 Linux x86_64 artifact SHA-256 verification
-zizmor archive contains the expected executable
+shared zizmor installer archive and SHA-256 verification
+Renovate JSON validation
 Renovate v46.3.14 tag resolves to acdd6bda8b035c99ce59d5675816af2aa65a1774
+actionlint .github/workflows/dependency-lint.yml .github/workflows/monitoring.yml .github/workflows/zizmor-sast.yml
 adversarial review: no blockers
 ```
 
 Blocked by existing baseline failures (also reproduced from `main`):
 
 ```text
-actionlint .github/workflows/*.yml
 bin/test-gitleaks-config
 ```
 
-`actionlint` reports pre-existing ShellCheck findings. `bin/test-gitleaks-config` fails its existing false-positive suppression case and detects zero planted-secret findings. Neither failure is caused by this five-file version update.
+`bin/test-gitleaks-config` fails its existing false-positive suppression case and detects zero planted-secret findings. It is not caused by this update.
 
 </details>
 
 <details>
 <summary>Rollback</summary>
 
-Revert commit `2fed5a6` to restore the former zizmor download behavior and Renovate action SHA.
+Revert the branch commits to restore the former inline installers and Renovate action SHA.
 
 </details>
 
