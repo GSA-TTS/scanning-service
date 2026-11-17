@@ -1,0 +1,49 @@
+name: Self-Repository Action Self-Test
+
+on:
+  pull_request:
+    paths:
+      - ".github/actions/**"
+      - ".github/workflows/**"
+      - "test/test_self_repository.py"
+  push:
+    branches: [main]
+    paths:
+      - ".github/actions/**"
+      - ".github/workflows/**"
+      - "test/test_self_repository.py"
+
+permissions:
+  contents: read
+
+jobs:
+  action-resolution:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve installer without a workspace checkout
+        uses: $/.github/actions/install-zizmor
+
+      - name: Check installer publishes CLI
+        run: zizmor --version
+
+      - name: Checkout repository data and tests
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Resolve repository-list action
+        id: repositories
+        uses: $/.github/actions/repo-list
+
+      - name: Check action output
+        env:
+          REPOSITORIES: ${{ steps.repositories.outputs.repos }}
+        run: test -n "$REPOSITORIES"
+
+      - name: Validate reference and workspace boundaries
+        run: python3 -m unittest discover -s test -p 'test_self_repository.py' -v
+
+  reusable-workflow:
+    uses: $/.github/workflows/dependency-lint.yml
+    with:
+      fail-on-error: false

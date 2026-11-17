@@ -30,7 +30,7 @@ jobs:
 
       - name: Load repository list
         id: repos
-        uses: ./.github/actions/repo-list
+        uses: $/.github/actions/repo-list
 
       - name: Generate GitHub App token
         id: app-token

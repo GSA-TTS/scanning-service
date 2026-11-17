@@ -23,7 +23,7 @@ jobs:
 
       - name: Load repository list
         id: repo-list
-        uses: ./.github/actions/repo-list
+        uses: $/.github/actions/repo-list
 
       - name: Generate GitHub App token
         id: app-token
@@ -138,11 +138,11 @@ jobs:
             .github/repos.txt
 
       - name: Install zizmor
-        uses: ./.github/actions/install-zizmor
+        uses: $/.github/actions/install-zizmor
 
       - name: Load repository list
         id: repo-list
-        uses: ./.github/actions/repo-list
+        uses: $/.github/actions/repo-list
 
       - name: Generate GitHub App token
         id: app-token

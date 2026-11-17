@@ -19,7 +19,7 @@ jobs:
           persist-credentials: false
 
       - name: Install zizmor
-        uses: ./.github/actions/install-zizmor
+        uses: $/.github/actions/install-zizmor
 
       - name: Check GitHub Actions SHA pinning
         id: actions-lint

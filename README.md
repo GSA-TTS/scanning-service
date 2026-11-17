@@ -33,6 +33,17 @@ This capability covers 17 NIST 800-53 controls across 7 families (CM, IA, RA, SA
 
 ## Key files
 
+Workflows and composite actions use GitHub.com's `$/` self-repository references
+to load sibling actions at the same commit as the file containing the reference.
+Reusable workflows therefore load scanning-service actions, not actions from the
+caller's checkout or an independently changing default branch. Commands still
+operate in the caller/consumer workspace; checkouts for source, configuration, and
+report scripts remain necessary. This syntax is not supported on GitHub Enterprise
+Server. The `self-repository-test.yml` workflow exercises action loading without a
+checkout and reusable-workflow invocation. Actionlint v1.7.12 does not yet support
+this syntax ([upstream #711](https://github.com/rhysd/actionlint/issues/711)); its
+syntax errors must not be mistaken for a passing lint run.
+
 | File | Purpose |
 |------|---------|
 | `default.json5` | Shared Renovate preset with compliance annotations |
