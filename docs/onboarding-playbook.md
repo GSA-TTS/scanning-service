@@ -40,6 +40,13 @@ In your repo's **Settings → Code security and analysis**, disable **Dependabot
 
 **Do NOT disable Dependabot alerts.** The alerts populate your Security tab and feed into the centralized vulnerability SLA tracking.
 
+If GitHub reports that alerts are disabled, SLA reporting marks the repository
+**not assessed**, excludes it from aggregate totals, and opens or reuses an
+automated configuration issue requesting that alerts be enabled. Other repositories
+continue to be assessed. The existing SLA report is left untouched until alert
+retrieval succeeds; the configuration issue then closes. Unknown access errors or
+failures to publish the configuration issue still fail the reporting run.
+
 ### 5. Delete per-repo vulnerability SLA workflow (if present)
 
 If your repo has a `vulnerability-sla-check.yml` or similar workflow, you can delete it. The org now provides centralized vulnerability SLA tracking that:
