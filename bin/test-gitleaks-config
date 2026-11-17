@@ -16,6 +16,24 @@ WORK_DIR="tmp/gitleaks-config-test"
 PASS=0
 FAIL=0
 
+require_command() {
+  if ! command -v "$1" > /dev/null 2>&1; then
+    echo "ERROR: $1 is required; install gitleaks v8.30.1 or add it to PATH." >&2
+    exit 2
+  fi
+}
+
+require_file() {
+  if [ ! -f "$1" ]; then
+    echo "ERROR: gitleaks config not found: $1" >&2
+    exit 2
+  fi
+}
+
+require_command gitleaks
+require_command jq
+require_file "$CONFIG"
+
 cleanup() { rm -rf "$WORK_DIR"; }
 trap cleanup EXIT
 mkdir -p "$WORK_DIR"
@@ -27,6 +45,7 @@ fail() { echo "  ✗ $1"; FAIL=$(( FAIL + 1 )); }
 
 # Run gitleaks on a directory; returns 0 if NO leaks found.
 scan() {
+  rm -f "$WORK_DIR/report.json"
   gitleaks detect \
     --source="$1" --no-git \
     --config="$CONFIG" \
@@ -123,8 +142,10 @@ echo "--- Real-secret detection ---"
 create_real_secret_fixtures
 if scan "$WORK_DIR/real" > /dev/null; then
   fail "gitleaks did NOT detect planted secrets — config may be suppressing too much"
+elif [ ! -s "$WORK_DIR/report.json" ] || ! jq -e 'length > 0' "$WORK_DIR/report.json" > /dev/null; then
+  fail "gitleaks did not produce findings for planted secrets"
 else
-  count="$(jq 'length' "$WORK_DIR/report.json" 2>/dev/null || echo 0)"
+  count="$(jq 'length' "$WORK_DIR/report.json")"
   pass "Detected $count finding(s) from planted secrets"
 fi
 

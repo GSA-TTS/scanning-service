@@ -12,10 +12,7 @@ runs:
   steps:
     - name: Install zizmor
       shell: bash
-      run: |
-        curl -sfL https://github.com/woodruffw/zizmor/releases/latest/download/zizmor-x86_64-unknown-linux-gnu.tar.gz | tar xz
-        chmod +x zizmor
-        sudo mv zizmor /usr/local/bin/
+      run: "${{ github.action_path }}/../install-zizmor/install-zizmor.sh"
 
     - name: Check GitHub Actions SHA pinning
       id: actions-lint

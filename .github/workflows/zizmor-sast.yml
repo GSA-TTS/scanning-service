@@ -30,6 +30,7 @@ jobs:
         with:
           persist-credentials: false
           sparse-checkout: |
+            .github/actions/install-zizmor
             .github/actions/repo-list
             .github/actions/signed-commit
             .github/repos.txt
@@ -39,10 +40,7 @@ jobs:
         uses: ./.github/actions/repo-list
 
       - name: Install zizmor
-        run: |
-          curl -sfL https://github.com/woodruffw/zizmor/releases/latest/download/zizmor-x86_64-unknown-linux-gnu.tar.gz | tar xz
-          chmod +x zizmor
-          sudo mv zizmor /usr/local/bin/
+        uses: ./.github/actions/install-zizmor
 
       - name: Scan repos
         env:
@@ -72,8 +70,10 @@ jobs:
           FIXED=0
           REPORTED=0
 
-          echo "# zizmor SAST Report — $TODAY" > "$GITHUB_WORKSPACE/sast-report.md"
-          echo "" >> "$GITHUB_WORKSPACE/sast-report.md"
+          {
+            echo "# zizmor SAST Report — $TODAY"
+            echo ""
+          } > "$GITHUB_WORKSPACE/sast-report.md"
 
           for repo in $REPOS; do
             SHORT_NAME=$(echo "$repo" | cut -d'/' -f2)
@@ -117,18 +117,20 @@ jobs:
             FINDINGS=$((FINDINGS + 1))
 
             if [ "$DRY_RUN" = "true" ]; then
-              echo "### ${SHORT_NAME}" >> "$GITHUB_WORKSPACE/sast-report.md"
-              echo '```' >> "$GITHUB_WORKSPACE/sast-report.md"
-              echo "$REPORT_OUTPUT" >> "$GITHUB_WORKSPACE/sast-report.md"
-              echo '```' >> "$GITHUB_WORKSPACE/sast-report.md"
-              echo "" >> "$GITHUB_WORKSPACE/sast-report.md"
+              {
+                echo "### ${SHORT_NAME}"
+                echo '```'
+                echo "$REPORT_OUTPUT"
+                echo '```'
+                echo ""
+              } >> "$GITHUB_WORKSPACE/sast-report.md"
               rm -rf "$WORKDIR"
               continue
             fi
 
             # Try auto-fixing (safe + unsafe fixes; PRs go through human review)
-            FIX_OUTPUT=$(zizmor --config /tmp/zizmor.yml --fix=all \
-              "$WORKDIR/.github/workflows/" 2>&1 || true)
+            zizmor --config /tmp/zizmor.yml --fix=all \
+              "$WORKDIR/.github/workflows/" || true
 
             cd "$WORKDIR"
 
@@ -255,13 +257,15 @@ jobs:
             rm -rf "$WORKDIR"
           done
 
-          echo "| Metric | Value |" >> "$GITHUB_WORKSPACE/sast-report.md"
-          echo "|--------|-------|" >> "$GITHUB_WORKSPACE/sast-report.md"
-          echo "| Repos scanned | ${SCANNED} |" >> "$GITHUB_WORKSPACE/sast-report.md"
-          echo "| Clean repos | ${CLEAN} |" >> "$GITHUB_WORKSPACE/sast-report.md"
-          echo "| Repos with findings | ${FINDINGS} |" >> "$GITHUB_WORKSPACE/sast-report.md"
-          echo "| PRs opened (auto-fixed) | ${FIXED} |" >> "$GITHUB_WORKSPACE/sast-report.md"
-          echo "| Issues opened/updated | ${REPORTED} |" >> "$GITHUB_WORKSPACE/sast-report.md"
+          {
+            echo "| Metric | Value |"
+            echo "|--------|-------|"
+            echo "| Repos scanned | ${SCANNED} |"
+            echo "| Clean repos | ${CLEAN} |"
+            echo "| Repos with findings | ${FINDINGS} |"
+            echo "| PRs opened (auto-fixed) | ${FIXED} |"
+            echo "| Issues opened/updated | ${REPORTED} |"
+          } >> "$GITHUB_WORKSPACE/sast-report.md"
 
           cat "$GITHUB_WORKSPACE/sast-report.md"
 
