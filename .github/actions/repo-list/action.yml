@@ -14,6 +14,9 @@ outputs:
   filter:
     description: "JSON array of repositories"
     value: ${{ steps.load.outputs.filter }}
+  token-repositories:
+    description: "Validated comma-separated repository names for this owner's App token"
+    value: ${{ steps.load.outputs.token-repositories }}
 
 runs:
   using: "composite"
@@ -21,6 +24,9 @@ runs:
     - name: Load repository list
       id: load
       shell: bash
+      env:
+        INSTALLATION_OWNER: ${{ github.repository_owner }}
+        ACTION_PATH: ${{ github.action_path }}
       run: |
         set -euo pipefail
 
@@ -33,6 +39,8 @@ runs:
           { print }
         ' "${{ inputs.repo-file }}" | jq -Rsc 'split("\n") | map(select(length > 0))')
         REPOS=$(echo "$FILTER" | jq -r 'join(" ")')
+        TOKEN_REPOSITORIES=$(echo "$FILTER" | bash "$ACTION_PATH/token-repositories.sh" "$INSTALLATION_OWNER")
 
         echo "repos=${REPOS}" >> "$GITHUB_OUTPUT"
         echo "filter=${FILTER}" >> "$GITHUB_OUTPUT"
+        echo "token-repositories=${TOKEN_REPOSITORIES}" >> "$GITHUB_OUTPUT"

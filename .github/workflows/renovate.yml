@@ -15,13 +15,23 @@ concurrency:
   group: renovate
   cancel-in-progress: false
 
-permissions: {}
+permissions:
+  contents: read
 
 jobs:
   renovate:
     name: Run Renovate
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Load repository list
+        id: repos
+        uses: ./.github/actions/repo-list
+
       - name: Generate GitHub App token
         id: app-token
         uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
@@ -29,18 +39,8 @@ jobs:
           app-id: ${{ secrets.RENOVATE_APP_ID }} # zizmor: ignore[secrets-outside-env]
           private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env]
           owner: ${{ github.repository_owner }}
-
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-
-      - name: Build repo filter
-        id: repos
-        run: |
-          # Convert repos.txt lines to a JSON array for Renovate's autodiscoverFilter
-          FILTER=$(jq -Rc '[inputs | select(. != "")]' .github/repos.txt)
-          echo "filter=${FILTER}" >> "$GITHUB_OUTPUT"
+          repositories: ${{ steps.repos.outputs.token-repositories }}
+          # Permission reduction is tracked in #32 pending installation grant inventory.
 
       - name: Run Renovate
         uses: renovatebot/github-action@acdd6bda8b035c99ce59d5675816af2aa65a1774 # v46.3.14
