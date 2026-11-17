@@ -33,6 +33,14 @@ This capability covers 17 NIST 800-53 controls across 7 families (CM, IA, RA, SA
 
 ## Key files
 
+The zizmor tracking issue shows the latest successful audit in a marked,
+scanner-owned description section. Text outside that section is preserved.
+Subscribers receive concise comments for new findings, severity increases,
+findings no longer reported, and closure/reopening—not identical weekly scans.
+Legacy issues establish a quiet baseline. “No longer reported” may result from
+code, configuration, suppression, or scanner changes; it is not a claim of
+remediation. Unsafe autofixes remain subject to manual review.
+
 Workflows and composite actions use GitHub.com's `$/` self-repository references
 to load sibling actions at the same commit as the file containing the reference.
 Reusable workflows therefore load scanning-service actions, not actions from the
