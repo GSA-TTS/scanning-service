@@ -13,7 +13,12 @@ runs:
     - name: Install zizmor
       shell: bash
       run: |
-        curl -sfL https://github.com/woodruffw/zizmor/releases/latest/download/zizmor-x86_64-unknown-linux-gnu.tar.gz | tar xz
+        set -euo pipefail
+        ZIZMOR_VERSION="1.32.0"
+        ZIZMOR_SHA256="bb110cc765eca9cd7efb2e284a956be5974c60027b0970f16397d86208a9957b"
+        curl -sfL "https://github.com/woodruffw/zizmor/releases/download/v${ZIZMOR_VERSION}/zizmor-x86_64-unknown-linux-gnu.tar.gz" -o zizmor.tar.gz
+        echo "${ZIZMOR_SHA256}  zizmor.tar.gz" | sha256sum --check
+        tar xzf zizmor.tar.gz
         chmod +x zizmor
         sudo mv zizmor /usr/local/bin/
 
