@@ -45,7 +45,7 @@ In your repo's **Settings → Code security and analysis**, disable **Dependabot
 If your repo has a `vulnerability-sla-check.yml` or similar workflow, you can delete it. The org now provides centralized vulnerability SLA tracking that:
 
 - Requires no per-repo configuration
-- Creates a "Vulnerability SLA Tracker" issue in your repo with weekly status comments
+- Maintains a "Vulnerability SLA Report" issue in your repo, refreshing its body weekly and commenting when alerts newly become overdue
 - Tracks the GSA CIO 2100.1 / BOD 22-01 SLA timelines
 
 ### 6. Customize (optional)
@@ -216,8 +216,8 @@ repos:
 
 After onboarding, check that:
 
-- A "Vulnerability SLA Tracker" issue appears in your repo (created automatically by the centralized workflow)
-- Weekly status comments reflect your open Dependabot alerts
+- A "Vulnerability SLA Report" issue appears in your repo (created automatically by the centralized workflow)
+- Its body is refreshed weekly with your open Dependabot alerts. Subscribe for comments when alerts pass their SLA; use sub-issues for remediation, risk decisions, and relevant PRs
 - Any overdue alerts are addressed within the SLA timeline
 
 ### 12. Import the OSCAL component definition (for SSP documentation)
