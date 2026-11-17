@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+# Usage:
+#   bin/run-benchmark [options]
+#
+# Options:
+#   --scanner NAME     Run only this scanner (repeatable). Overrides scanners.json.
+#   --all-available    Run every adapter whose binary is installed.
+#   --runs N           Timing repetitions per scanner (default from scanners.json).
+#   --target DIR       Scan a real local repo instead of the synthetic corpus.
+#                      (Unscored: reports findings + speed only.)
+#   --corpus DIR       Use/generate the corpus at DIR (default: ./.corpus).
+#   --keep-corpus      Reuse an existing corpus instead of regenerating.
+#
+# Enabling more scanners:
+#   - Flip "enabled": true in scanners.json (ggshield, ripsecrets, ...), or
+#   - Drop a new scanners.d/<tool>.sh adapter (see gitleaks.sh for the contract)
+#     and add a matching entry to scanners.json. Downstream repos that extend
+#     this repo can do the same without touching the runner.
+
+set -euo pipefail
+
+HERE="$(cd "$(dirname "$0")/.." && pwd)"
+ADAPTER_DIR="$HERE/scanners.d"
+CONFIG="$HERE/scanners.json"
+RESULTS="$HERE/results"
+WORK="$HERE/.work"
+CORPUS_DIR="${CORPUS_DIR:-$HERE/.corpus}"
+
+RUNS="$(python3 -c "import json;print(json.load(open('$CONFIG')).get('runs',3))")"
+TARGET=""
+ALL_AVAIL=0
+KEEP_CORPUS=0
+SELECT=""
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --scanner)      SELECT="$SELECT $2"; shift 2 ;;
+    --all-available) ALL_AVAIL=1; shift ;;
+    --runs)         RUNS="$2"; shift 2 ;;
+    --target)       TARGET="$2"; shift 2 ;;
+    --corpus)       CORPUS_DIR="$2"; shift 2 ;;
+    --keep-corpus)  KEEP_CORPUS=1; shift ;;
+    -h|--help)      sed -n '2,30p' "$0"; exit 0 ;;
+    *) echo "unknown arg: $1" >&2; exit 2 ;;
+  esac
+done
+
+# Load adapters
+for f in "$ADAPTER_DIR"/*.sh; do
+  # shellcheck disable=SC1090
+  . "$f"
+done
+
+is_enabled() {
+  python3 -c "import json;c=json.load(open('$CONFIG'));print('1' if c['scanners'].get('$1',{}).get('enabled') else '0')"
+}
+
+# Decide scanned directory
+if [ -n "$TARGET" ]; then
+  SCAN_DIR="$TARGET"
+  echo "==> Target mode (unscored): $SCAN_DIR"
+else
+  SCAN_DIR="$CORPUS_DIR"
+  if [ "$KEEP_CORPUS" -eq 1 ] && [ -d "$CORPUS_DIR" ]; then
+    echo "==> Reusing corpus: $CORPUS_DIR"
+  else
+    CORPUS_DIR="$CORPUS_DIR" "$HERE/bin/generate-corpus" --out "$CORPUS_DIR"
+  fi
+fi
+
+rm -rf "$WORK"; mkdir -p "$WORK" "$RESULTS"
+: > "$WORK/timing.tsv"
+: > "$WORK/meta.tsv"
+
+# Build the scanner list
+CANDIDATES=""
+for f in "$ADAPTER_DIR"/*.sh; do
+  CANDIDATES="$CANDIDATES $(basename "$f" .sh)"
+done
+
+echo ""
+echo "==> Running (runs=$RUNS per scanner)"
+RAN=0
+for id in $CANDIDATES; do
+  # selection logic
+  if [ -n "$SELECT" ]; then
+    case " $SELECT " in *" $id "*) : ;; *) continue ;; esac
+  elif [ "$ALL_AVAIL" -eq 0 ] && [ "$(is_enabled "$id")" != "1" ]; then
+    echo "  - $id: skipped (disabled in scanners.json)"
+    continue
+  fi
+
+  if ! "${id}_available"; then
+    echo "  - $id: SKIPPED (not installed or not authenticated)"
+    continue
+  fi
+
+  norm="$RESULTS/${id}.norm.json"
+  # First run produces the normalized findings; all runs contribute timing.
+  i=1
+  while [ "$i" -le "$RUNS" ]; do
+    start="$(python3 -c 'import time;print(repr(time.time()))')"
+    "${id}_scan" "$SCAN_DIR" "$norm"
+    end="$(python3 -c 'import time;print(repr(time.time()))')"
+    printf '%s\t%s\n' "$id" "$(python3 -c "print($end-$start)")" >> "$WORK/timing.tsv"
+    i=$(( i + 1 ))
+  done
+  printf '%s\t%s\t%s\n' "$id" "$("${id}_validation")" "$("${id}_config_interop")" >> "$WORK/meta.tsv"
+  count="$(jq 'length' "$norm" 2>/dev/null || echo 0)"
+  echo "  - $id: done (${count} findings)"
+  RAN=$(( RAN + 1 ))
+done
+
+if [ "$RAN" -eq 0 ]; then
+  echo "No scanners ran. Enable some in scanners.json or pass --all-available." >&2
+  exit 1
+fi
+
+echo ""
+python3 "$HERE/lib/score.py" \
+  --corpus "$([ -n "$TARGET" ] && echo "" || echo "$SCAN_DIR")" \
+  --target "$TARGET" \
+  --results "$RESULTS" \
+  --timing "$WORK/timing.tsv" \
+  --meta "$WORK/meta.tsv" \
+  --out "$RESULTS"
+
+echo ""
+echo "Report: $RESULTS/latest.md  (JSON: $RESULTS/latest.json)"

@@ -1,0 +1,8 @@
+# Generated/local artifacts — never commit.
+# The corpus contains realistic (but synthetic) secret material; keeping it out
+# of version control is how we "redact the specifics" from the repo.
+.corpus/
+.work/
+results/*.json
+results/*.md
+!results/.gitkeep

@@ -1,0 +1,31 @@
+{
+  "$schema": "./scanners.schema.json",
+  "runs": 3,
+  "scanners": {
+    "gitleaks": {
+      "enabled": true,
+      "role": "baseline",
+      "note": "Org standard (see .gitleaks.toml). Always run for comparison."
+    },
+    "trufflehog": {
+      "enabled": true,
+      "role": "candidate",
+      "note": "Issue #23 benchmark target. Adds live-credential verification."
+    },
+    "kingfisher": {
+      "enabled": true,
+      "role": "candidate",
+      "note": "Issue #23 benchmark target. Ships validation + entropy scoring."
+    },
+    "ggshield": {
+      "enabled": false,
+      "role": "excluded",
+      "note": "SaaS-backed (GitGuardian API) — excluded from the offline benchmark. See ADR-0003."
+    },
+    "ripsecrets": {
+      "enabled": true,
+      "role": "optional",
+      "note": "Fast local regex scanner. Runs fully offline."
+    }
+  }
+}
